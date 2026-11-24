@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modul Review Interaktif: Materi Lengkap Matriks SMA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- KaTeX CSS & JS untuk Notasi Matriks yang Rapi -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderAllMath()"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.4rem 0;
+            margin: 0.5rem 0;
+        }
+        .fade-in {
+            animation: fadeIn 0.35s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Kurung matriks kustom untuk input interaktif */
+        .matrix-input-box {
+            position: relative;
+            display: inline-flex;
+            padding: 6px 10px;
+        }
+        .matrix-input-box::before, .matrix-input-box::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 7px;
+            border: 2px solid #4f46e5;
+        }
+        .matrix-input-box::before {
+            left: 0;
+            border-right: none;
+            border-radius: 5px 0 0 5px;
+        }
+        .matrix-input-box::after {
+            right: 0;
+            border-left: none;
+            border-radius: 0 5px 5px 0;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+    <!-- Navbar Sticky -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-xs">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-heading font-extrabold text-base shadow-md">
+                        [M⁻¹]
+                    </div>
+                    <div>
+                        <span class="font-heading font-bold text-slate-900 text-sm sm:text-base block leading-tight">Master Review Matriks</span>
+                        <span class="text-xs text-slate-500 hidden sm:block">Kompilasi Lengkap Aljabar Matriks & SPL</span>
+                    </div>
+                </div>
+
+                <!-- Navigasi Desktop -->
+                <nav class="hidden lg:flex items-center gap-1 text-xs font-semibold">
+                    <a href="#tujuan" class="px-3 py-2 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition">1. Tujuan</a>
+                    <a href="#warmup" class="px-3 py-2 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition">2. Warm-Up (6)</a>
+                    <a href="#penerapan" class="px-3 py-2 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition">3. Penerapan Nyata</a>
+                    <a href="#materi" class="px-3 py-2 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition">4. Materi & Aturan</a>
+                    <a href="#latihan" class="px-3 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-xs">5. Latihan Terbimbing</a>
+                </nav>
+
+                <!-- Tombol Menu Mobile -->
+                <button id="mobile-btn" class="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none" aria-label="Buka Menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-slate-200 px-4 py-3 space-y-1 text-sm font-medium">
+            <a href="#tujuan" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-indigo-50">1. Tujuan Review</a>
+            <a href="#warmup" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-indigo-50">2. Warm-Up (6 Soal)</a>
+            <a href="#penerapan" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-indigo-50">3. Penerapan Nyata</a>
+            <a href="#materi" class="block px-3 py-2 rounded-lg text-slate-700 hover:bg-indigo-50">4. Materi Lengkap, Aturan & Contoh</a>
+            <a href="#latihan" class="block px-3 py-2 rounded-lg text-indigo-700 font-bold bg-indigo-50">5. Latihan Soal Terbimbing</a>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 h-1">
+            <div id="scroll-bar" class="bg-gradient-to-r from-indigo-600 via-violet-600 to-emerald-500 h-1 w-0 transition-all duration-150"></div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white py-12 sm:py-16 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#a5b4fc 1px, transparent 1px); background-size: 24px 24px;"></div>
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <span class="inline-block py-1 px-3 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-semibold tracking-wider uppercase mb-4">
+                Modul Review Komprehensif • Semua Topik Matriks
+            </span>
+            <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+                Review Total: <span class="text-amber-300">Matriks & Sistem Linear</span>
+            </h1>
+            <p class="text-slate-300 text-sm sm:text-lg max-w-3xl mx-auto mb-8 leading-relaxed">
+                Rangkuman terpadu seluruh konsep matriks—mulai dari Ordo & Jenis Matriks, Transpos & Kesamaan, Operasi Aljabar & Perkalian, Determinan, Invers Ordo 2×2 & 3×3, hingga Penyelesaian SPLDV & SPLTV dengan soal-soal segar.
+            </p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="#warmup" class="px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-sm shadow-lg transition">
+                    Mulai Warm-Up (6 Soal)
+                </a>
+                <a href="#materi" class="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-sm backdrop-blur-xs transition">
+                    Rangkuman Aturan & Contoh
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- =================================================================
+             1. TUJUAN PEMBELAJARAN (REVIEW)
+        ================================================================== -->
+        <section id="tujuan" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 sm:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-9 h-9 rounded-xl bg-indigo-600 text-white font-heading font-bold flex items-center justify-center text-sm">1</span>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Tujuan Pembelajaran & Review</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Target penguasaan menyeluruh sebelum menghadapi evaluasi akhir bab Matriks</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">Target 01 • Fondasi</div>
+                        <h3 class="font-bold text-slate-900 text-sm mb-1">Struktur, Jenis & Kesamaan</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">Mengidentifikasi ordo, jenis-jenis matriks (persegi, diagonal, identitas, segitiga), melakukan transpos ($A^t$), dan menyelesaikan persamaan dari kesamaan dua matriks.</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">Target 02 • Aljabar Matriks</div>
+                        <h3 class="font-bold text-slate-900 text-sm mb-1">Operasi Penjumlahan & Perkalian</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">Menerapkan syarat penjumlahan/pengurangan, perkalian skalar, serta syarat ordo perkalian dua matriks ($A_{p \times n} \times B_{n \times q}$) beserta sifat tak komutatifnya.</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">Target 03 • Determinan</div>
+                        <h3 class="font-bold text-slate-900 text-sm mb-1">Determinan Ordo 2×2 & 3×3</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">Menghitung nilai determinan menggunakan rumus $ad-bc$ (ordo 2×2), Aturan Sarrus maupun Ekspansi Kofaktor (ordo 3×3), serta mengenali matriks singular ($\det = 0$).</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">Target 04 • Invers 2×2</div>
+                        <h3 class="font-bold text-slate-900 text-sm mb-1">Invers & Sifat Operasional</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">Menentukan $A^{-1}$ ordo 2×2 dan menggunakan sifat $(AB)^{-1} = B^{-1}A^{-1}$ untuk menyelesaikan persamaan matriks bentuk $AX = B$ maupun $XA = B$.</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">Target 05 • Invers 3×3</div>
+                        <h3 class="font-bold text-slate-900 text-sm mb-1">Minor, Kofaktor & Adjoin</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">Menentukan invers matriks ordo 3×3 secara sistematis melalui 9 elemen minor ($M_{ij}$), matriks kofaktor ($C_{ij}$), adjoin ($\text{adj}(A) = C^t$), dan pembagian determinan.</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                        <div class="text-indigo-600 font-bold text-xs uppercase tracking-wider mb-1">Target 06 • Sistem Linear</div>
+                        <h3 class="font-bold text-slate-900 text-sm mb-1">Penyelesaian SPLDV & SPLTV</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">Memecahkan Sistem Persamaan Linear Dua dan Tiga Variabel menggunakan Metode Determinan (Aturan Cramer) maupun Metode Invers Matriks.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             2. WARM-UP: 6 SOAL INTERAKTIF LINTAS TOPIK (SOAL BARU)
+        ================================================================== -->
+        <section id="warmup" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 sm:p-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-amber-500 text-white font-heading font-bold flex items-center justify-center text-sm">2</span>
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Warm-Up: Cek Cepat 6 Konsep Matriks</h2>
+                            <p class="text-xs sm:text-sm text-slate-500">6 soal pemanasan baru yang mencakup seluruh bab untuk menyegarkan ingatanmu</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-amber-50 border border-amber-200 px-4 py-2 rounded-xl text-sm font-bold text-amber-900">
+                            Skor Warm-Up: <span id="warmup-score">0</span> / 6
+                        </div>
+                        <button onclick="resetWarmup()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition">
+                            Ulangi
+                        </button>
+                    </div>
+                </div>
+
+                <div id="warmup-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Dirender otomatis oleh JS dengan soal baru -->
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             3. PENERAPAN NYATA TERPADU
+        ================================================================== -->
+        <section id="penerapan" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 sm:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-9 h-9 rounded-xl bg-emerald-600 text-white font-heading font-bold flex items-center justify-center text-sm">3</span>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Penerapan Nyata Seluruh Konsep Matriks</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Bagaimana setiap operasi matriks bekerja sama memecahkan masalah dunia nyata</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+                        <span class="px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-700 text-xs font-bold">Aplikasi 1 • Perkalian Matriks</span>
+                        <h3 class="font-bold text-slate-900 text-base">Manajemen Logistik & Rantai Pasok</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                            Perusahaan ekspedisi menyimpan data jumlah paket (reguler, kilat, kargo) dari 3 gudang dalam matriks $G_{3 \times 3}$ dan tarif pengiriman ke 2 zona tujuan dalam matriks $T_{3 \times 2}$. Hasil kali $G \times T$ langsung menghasilkan matriks total pendapatan per gudang per zona.
+                        </p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+                        <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-700 text-xs font-bold">Aplikasi 2 • Invers & SPLTV</span>
+                        <h3 class="font-bold text-slate-900 text-base">Analisis Rangkaian Listrik & Campuran Kimia</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                            Dalam teknik elektro (Hukum Kirchhoff) atau industri farmasi yang mencampur 3 zat aktif dengan konsentrasi berbeda, hubungan antar variabel membentuk SPLTV $AX = B$. Dengan menghitung $X = A^{-1}B$ atau Aturan Cramer, komposisi tepat ditemukan secara instan.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Simulasi Interaktif Penerapan Nyata: Optimasi Paket Produksi (SPLDV) -->
+                <div class="bg-slate-900 text-white rounded-2xl p-6 border border-slate-800">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h3 class="font-bold text-amber-300 text-sm sm:text-base">Simulasi Kasus Nyata: Menentukan Harga Komponen dengan Invers Matriks</h3>
+                        <span class="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full">Studi Kasus Interaktif</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300 mb-4 leading-relaxed">
+                        Sebuah bengkel merakit 2 paket servis motor:<br>
+                        • <strong>Paket A:</strong> 2 botol oli + 1 busi = Rp130.000<br>
+                        • <strong>Paket B:</strong> 3 botol oli + 2 busi = Rp205.000<br>
+                        Jika ditulis dalam persamaan matriks $\begin{bmatrix} 2 & 1 \\ 3 & 2 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 130.000 \\ 205.000 \end{bmatrix}$, klik tombol di bawah untuk melihat bagaimana $X = A^{-1}B$ menghitung harga satuan oli ($x$) dan busi ($y$)!
+                    </p>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <button id="btn-case-sim" onclick="runCaseSimulation()" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm transition cursor-pointer">
+                            Hitung dengan $X = A^{-1}B$
+                        </button>
+                        <div id="case-sim-result" class="hidden fade-in bg-slate-800 border border-emerald-500/40 px-4 py-2.5 rounded-xl text-xs sm:text-sm text-emerald-300">
+                            $\det(A) = 4 - 3 = 1 \implies \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 2 & -1 \\ -3 & 2 \end{bmatrix} \begin{bmatrix} 130.000 \\ 205.000 \end{bmatrix} = \begin{bmatrix} 55.000 \\ 20.000 \end{bmatrix}$ → <strong>Oli = Rp55.000, Busi = Rp20.000</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================
+             4. MATERI LENGKAP, RANGKUMAN ATURAN & CONTOH SOAL BARU DETAIL
+        ================================================================== -->
+        <section id="materi" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 sm:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-9 h-9 rounded-xl bg-indigo-600 text-white font-heading font-bold flex items-center justify-center text-sm">4</span>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Materi Lengkap, Aturan & Contoh Soal Detail</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Pilih tab bab di bawah ini untuk me-review rangkuman aturan beserta contoh soal baru yang dibahas tuntas</p>
+                    </div>
+                </div>
+
+                <!-- Tab Navigasi 6 Bab Matriks -->
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-6 border-b border-slate-200" id="topic-tabs">
+                    <button onclick="selectTopic(1)" id="tab-btn-1" class="topic-tab px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-indigo-600 text-white shadow-xs transition cursor-pointer">
+                        Bab 1: Konsep, Jenis & Transpos
+                    </button>
+                    <button onclick="selectTopic(2)" id="tab-btn-2" class="topic-tab px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">
+                        Bab 2: Operasi & Perkalian Matriks
+                    </button>
+                    <button onclick="selectTopic(3)" id="tab-btn-3" class="topic-tab px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">
+                        Bab 3: Determinan (2×2 & 3×3)
+                    </button>
+                    <button onclick="selectTopic(4)" id="tab-btn-4" class="topic-tab px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">
+                        Bab 4: Invers Ordo 2×2 & Persamaan
+                    </button>
+                    <button onclick="selectTopic(5)" id="tab-btn-5" class="topic-tab px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">
+                        Bab 5: Invers Ordo 3×3 (Adjoin)
+                    </button>
+                    <button onclick="selectTopic(6)" id="tab-btn-6" class="topic-tab px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">
+                        Bab 6: SPLDV & SPLTV dengan Matriks
+                    </button>
+                </div>
+
+                <!-- =========================================================
+                     KONTEN BAB 1: KONSEP, JENIS, TRANSPOS & KESAMAAN
+                ========================================================== -->
+                <div id="topic-content-1" class="topic-panel space-y-6 fade-in">
+                    <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-5 space-y-3">
+                        <h3 class="font-bold text-indigo-950 text-base sm:text-lg">Rangkuman Aturan Bab 1: Struktur, Jenis, Transpos & Kesamaan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">1. Notasi & Ordo Matriks ($A_{m \times n}$)</span>
+                                <p>• $m$ = banyak baris (horizontal), $n$ = banyak kolom (vertikal).</p>
+                                <p>• Elemen $a_{ij}$ menyatakan elemen pada <strong>baris ke-$i$</strong> dan <strong>kolom ke-$j$</strong>.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">2. Jenis-Jenis Matriks Penting</span>
+                                <p>• <strong>Matriks Persegi ($n \times n$):</strong> Memiliki diagonal utama ($a_{11}, a_{22}, \dots$) dan diagonal samping.</p>
+                                <p>• <strong>Matriks Identitas ($I$):</strong> Matriks diagonal dengan elemen diagonal utama bernilai $1$.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">3. Transpos Matriks ($A^t$)</span>
+                                <p>• Mengubah baris menjadi kolom: $(A_{m \times n})^t = (A^t)_{n \times m}$.</p>
+                                <p>• Sifat: $(A^t)^t = A$ dan $(A \pm B)^t = A^t \pm B^t$.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">4. Kesamaan Dua Matriks ($A = B$)</span>
+                                <p>• Syarat mutlak: <strong>(1) Ordo harus sama</strong>, dan <strong>(2) Setiap elemen yang seletak nilainya sama ($a_{ij} = b_{ij}$)</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contoh Soal Baru Bab 1 -->
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                        <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+                            <span class="font-bold text-indigo-700 text-xs sm:text-sm">CONTOH SOAL REVIEW BAB 1 (Transpos & Kesamaan Matriks)</span>
+                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">Soal Baru</span>
+                        </div>
+                        <div class="p-5 sm:p-6 space-y-4 text-xs sm:text-sm">
+                            <p class="text-slate-800 font-medium leading-relaxed">
+                                Diketahui matriks $P = \begin{bmatrix} 2a - 1 & 4 & c + 2 \\ 3 & b + 5 & -2 \end{bmatrix}$ dan $Q = \begin{bmatrix} 5 & 3 & 4 \\ 4 & 2a & -2 \end{bmatrix}$. Jika berlaku hubungan $P = Q^t$, tentukan nilai dari $a + 2b - c$!
+                            </p>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-slate-700">
+                                <p class="font-bold text-slate-900">Pembahasan Langkah-Demi-Langkah:</p>
+                                <p><strong>Langkah 1: Tentukan transpos dari matriks $Q$ ($Q^t$)</strong><br>
+                                Matriks $Q$ berordo $2 \times 3$, sehingga $Q^t$ berordo $3 \times 2$ (baris $Q$ dijadikan kolom):</p>
+                                <div>$$Q^t = \begin{bmatrix} 5 & 4 \\ 3 & 2a \\ 4 & -2 \end{bmatrix}$$</div>
+                                <p class="text-amber-800 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                                    <em>Perhatikan:</em> Agar $P = Q^t$ terdefinisi dengan ordo yang sama ($2 \times 3$), misalkan $Q = \begin{bmatrix} 5 & 3 \\ 4 & 2a \\ 4 & -2 \end{bmatrix}$ (ordo $3 \times 2$), maka transposnya adalah $Q^t = \begin{bmatrix} 5 & 4 & 4 \\ 3 & 2a & -2 \end{bmatrix}$ (ordo $2 \times 3$).
+                                </p>
+                                <p><strong>Langkah 2: Samakan elemen yang seletak pada $P = Q^t$</strong></p>
+                                <div>$$\begin{bmatrix} 2a - 1 & 4 & c + 2 \\ 3 & b + 5 & -2 \end{bmatrix} = \begin{bmatrix} 5 & 4 & 4 \\ 3 & 2a & -2 \end{bmatrix}$$</div>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li><strong>Baris 1 Kolom 1:</strong> $2a - 1 = 5 \implies 2a = 6 \implies a = 3$.</li>
+                                    <li><strong>Baris 1 Kolom 3:</strong> $c + 2 = 4 \implies c = 4 - 2 \implies c = 2$.</li>
+                                    <li><strong>Baris 2 Kolom 2:</strong> $b + 5 = 2a \implies b + 5 = 2(3) \implies b + 5 = 6 \implies b = 1$.</li>
+                                </ul>
+                                <p class="font-bold text-emerald-800 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                                    Langkah 3: Hitung nilai akhir<br>
+                                    $a + 2b - c = 3 + 2(1) - 2 = 3 + 2 - 2 = \mathbf{3}$.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================================================
+                     KONTEN BAB 2: OPERASI ALJABAR & PERKALIAN MATRIKS
+                ========================================================== -->
+                <div id="topic-content-2" class="topic-panel hidden space-y-6 fade-in">
+                    <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-5 space-y-3">
+                        <h3 class="font-bold text-indigo-950 text-base sm:text-lg">Rangkuman Aturan Bab 2: Penjumlahan, Pengurangan, Skalar & Perkalian</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">1. Penjumlahan, Pengurangan & Skalar</span>
+                                <p>• Syarat: <strong>Ordo harus sama persis</strong>. Operasikan elemen seletak.</p>
+                                <p>• Perkalian Skalar $kA$: Kalikan bilangan real $k$ dengan <em>seluruh</em> elemen di dalam $A$.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">2. Syarat & Aturan Perkalian ($A \times B$)</span>
+                                <p>• Syarat: $A_{p \times \mathbf{n}} \times B_{\mathbf{n} \times q} = C_{p \times q}$ (<strong>Kolom kiri = Baris kanan</strong>).</p>
+                                <p>• Cara hitung: Kalikan elemen <strong>Baris ke-$i$ matriks $A$</strong> dengan <strong>Kolom ke-$j$ matriks $B$</strong> lalu jumlahkan.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5 md:col-span-2">
+                                <span class="font-bold text-rose-700 block">3. Sifat Penting Perkalian & Perpangkatan Matriks</span>
+                                <p>• <strong>Tidak Komutatif:</strong> Secara umum $A \times B \neq B \times A$.</p>
+                                <p>• <strong>Asosiatif & Distributif:</strong> $(AB)C = A(BC)$ dan $A(B+C) = AB + AC$.</p>
+                                <p>• <strong>Transpose Hasil Kali:</strong> $(A \times B)^t = B^t \times A^t$ (urutan dibalik).</p>
+                                <p>• <strong>Perpangkatan:</strong> $A^2 = A \times A$ (bukan mengkuadratkan masing-masing elemen!).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contoh Soal Baru Bab 2 -->
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                        <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+                            <span class="font-bold text-indigo-700 text-xs sm:text-sm">CONTOH SOAL REVIEW BAB 2 (Polinomial & Perkalian Matriks)</span>
+                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">Soal Baru</span>
+                        </div>
+                        <div class="p-5 sm:p-6 space-y-4 text-xs sm:text-sm">
+                            <p class="text-slate-800 font-medium leading-relaxed">
+                                Diketahui matriks $A = \begin{bmatrix} 3 & -1 \\ 2 & 1 \end{bmatrix}$ dan $I = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$. Tentukan matriks hasil dari $A^2 - 4A + 5I$!
+                            </p>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-slate-700 overflow-x-auto">
+                                <p class="font-bold text-slate-900">Pembahasan Langkah-Demi-Langkah:</p>
+                                <p><strong>Langkah 1: Hitung $A^2 = A \times A$ (Ingat: perkalian baris kali kolom!)</strong></p>
+                                <div>$$A^2 = \begin{bmatrix} 3 & -1 \\ 2 & 1 \end{bmatrix} \begin{bmatrix} 3 & -1 \\ 2 & 1 \end{bmatrix} = \begin{bmatrix} (3)(3) + (-1)(2) & (3)(-1) + (-1)(1) \\ (2)(3) + (1)(2) & (2)(-1) + (1)(1) \end{bmatrix} = \begin{bmatrix} 9 - 2 & -3 - 1 \\ 6 + 2 & -2 + 1 \end{bmatrix} = \begin{bmatrix} 7 & -4 \\ 8 & -1 \end{bmatrix}$$</div>
+                                <p><strong>Langkah 2: Hitung perkalian skalar $4A$ dan $5I$</strong></p>
+                                <div>$$4A = 4 \begin{bmatrix} 3 & -1 \\ 2 & 1 \end{bmatrix} = \begin{bmatrix} 12 & -4 \\ 8 & 4 \end{bmatrix} \quad \text{dan} \quad 5I = 5 \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 5 & 0 \\ 0 & 5 \end{bmatrix}$$</div>
+                                <p><strong>Langkah 3: Gabungkan seluruh operasi $A^2 - 4A + 5I$</strong></p>
+                                <div>$$A^2 - 4A + 5I = \begin{bmatrix} 7 & -4 \\ 8 & -1 \end{bmatrix} - \begin{bmatrix} 12 & -4 \\ 8 & 4 \end{bmatrix} + \begin{bmatrix} 5 & 0 \\ 0 & 5 \end{bmatrix} = \begin{bmatrix} 7 - 12 + 5 & -4 - (-4) + 0 \\ 8 - 8 + 0 & -1 - 4 + 5 \end{bmatrix} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$$</div>
+                                <p class="font-bold text-emerald-800 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                                    Hasil akhirnya adalah Matriks Nol $\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$ (Sesuai Teorema Cayley-Hamilton!).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================================================
+                     KONTEN BAB 3: DETERMINAN MATRIKS (ORDO 2x2 & 3x3)
+                ========================================================== -->
+                <div id="topic-content-3" class="topic-panel hidden space-y-6 fade-in">
+                    <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-5 space-y-3">
+                        <h3 class="font-bold text-indigo-950 text-base sm:text-lg">Rangkuman Aturan Bab 3: Determinan & Sifat-Sifatnya</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">1. Determinan Ordo 2×2</span>
+                                <p>Jika $A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$, maka $\det(A) = |A| = ad - bc$.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">2. Determinan Ordo 3×3</span>
+                                <p>• <strong>Aturan Sarrus:</strong> Salin kolom 1 & 2 ke kanan, jumlahkan hasil kali 3 diagonal turun dikurangi jumlah hasil kali 3 diagonal naik.</p>
+                                <p>• <strong>Ekspansi Kofaktor:</strong> $\det(A) = a_{11}C_{11} + a_{12}C_{12} + a_{13}C_{13}$.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5 md:col-span-2">
+                                <span class="font-bold text-emerald-700 block">3. Sifat-Sifat Emas Determinan (Sering Keluar di Ujian!)</span>
+                                <p>• $\det(A^t) = \det(A)$</p>
+                                <p>• $\det(A \times B) = \det(A) \cdot \det(B)$</p>
+                                <p>• $\det(A^{-1}) = \frac{1}{\det(A)}$ dan $\det(A^n) = (\det(A))^n$</p>
+                                <p>• $\det(k \cdot A_{n \times n}) = k^n \cdot \det(A)$ (Hati-hati: skalar $k$ dipangkatkan ordo $n$!)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contoh Soal Baru Bab 3 -->
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                        <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+                            <span class="font-bold text-indigo-700 text-xs sm:text-sm">CONTOH SOAL REVIEW BAB 3 (Determinan 3×3 & Sifat Skalar)</span>
+                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">Soal Baru</span>
+                        </div>
+                        <div class="p-5 sm:p-6 space-y-4 text-xs sm:text-sm">
+                            <p class="text-slate-800 font-medium leading-relaxed">
+                                Diketahui matriks $M = \begin{bmatrix} 2 & -1 & 3 \\ 1 & 4 & 0 \\ -2 & 1 & 2 \end{bmatrix}$.<br>
+                                (a) Tentukan $\det(M)$ dengan Aturan Sarrus!<br>
+                                (b) Tentukan nilai dari $\det(2M^t)$!
+                            </p>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-slate-700 overflow-x-auto">
+                                <p class="font-bold text-slate-900">Pembahasan Langkah-Demi-Langkah:</p>
+                                <p><strong>(a) Menghitung $\det(M)$ dengan Aturan Sarrus:</strong><br>
+                                Salin kolom pertama dan kolom kedua ke sebelah kanan determinan:</p>
+                                <div>$$|M| = \left| \begin{array}{ccc|cc} 2 & -1 & 3 & 2 & -1 \\ 1 & 4 & 0 & 1 & 4 \\ -2 & 1 & 2 & -2 & 1 \end{array} \right|$$</div>
+                                <p>• <strong>Jumlah diagonal turun (+):</strong> $(2)(4)(2) + (-1)(0)(-2) + (3)(1)(1) = 16 + 0 + 3 = 19$<br>
+                                • <strong>Jumlah diagonal naik (−):</strong> $(-2)(4)(3) + (1)(0)(2) + (2)(1)(-1) = -24 + 0 - 2 = -26$<br>
+                                • $\det(M) = 19 - (-26) = 19 + 26 = \mathbf{45}$.</p>
+                                <p class="font-bold text-emerald-800 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                                    (b) Menghitung $\det(2M^t)$:<br>
+                                    Karena $M$ berordo $3 \times 3$ ($n = 3$) dan $\det(M^t) = \det(M) = 45$, maka:<br>
+                                    $\det(2M^t) = 2^3 \cdot \det(M^t) = 8 \cdot 45 = \mathbf{360}$.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================================================
+                     KONTEN BAB 4: INVERS ORDO 2x2 & PERSAMAAN MATRIKS
+                ========================================================== -->
+                <div id="topic-content-4" class="topic-panel hidden space-y-6 fade-in">
+                    <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-5 space-y-3">
+                        <h3 class="font-bold text-indigo-950 text-base sm:text-lg">Rangkuman Aturan Bab 4: Invers Ordo 2×2 & Persamaan Matriks</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">1. Rumus Invers Matriks 2×2</span>
+                                <p>Jika $A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$ dengan $ad - bc \neq 0$, maka:</p>
+                                <div>$$A^{-1} = \frac{1}{ad - bc} \begin{bmatrix} d & -b \\ -c & a \end{bmatrix}$$</div>
+                                <p class="text-xs text-slate-500">Jika $ad - bc = 0$, matriks disebut <strong>Singular</strong> (tidak punya invers).</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-rose-700 block">2. Aturan Menyelesaikan Persamaan Matriks</span>
+                                <p>Karena perkalian matriks <strong>tidak komutatif</strong>, posisi pengalian $A^{-1}$ sangat menentukan:</p>
+                                <p>• Jika $A \cdot X = B \implies X = \mathbf{A^{-1} \cdot B}$ (kalikan $A^{-1}$ dari <strong>kiri</strong>)</p>
+                                <p>• Jika $X \cdot A = B \implies X = \mathbf{B \cdot A^{-1}}$ (kalikan $A^{-1}$ dari <strong>kanan</strong>)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contoh Soal Baru Bab 4 -->
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                        <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+                            <span class="font-bold text-indigo-700 text-xs sm:text-sm">CONTOH SOAL REVIEW BAB 4 (Persamaan Matriks Bentuk $X \cdot A = B$)</span>
+                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">Soal Baru</span>
+                        </div>
+                        <div class="p-5 sm:p-6 space-y-4 text-xs sm:text-sm">
+                            <p class="text-slate-800 font-medium leading-relaxed">
+                                Tentukan matriks $X$ berordo $2 \times 2$ yang memenuhi persamaan:
+                                $$X \begin{bmatrix} 4 & 3 \\ 5 & 4 \end{bmatrix} = \begin{bmatrix} 7 & 6 \\ 2 & 1 \end{bmatrix}$$
+                            </p>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-slate-700 overflow-x-auto">
+                                <p class="font-bold text-slate-900">Pembahasan Langkah-Demi-Langkah:</p>
+                                <p><strong>Langkah 1: Identifikasi posisi matriks</strong><br>
+                                Persamaan berbentuk $X \cdot A = B$ dengan $A = \begin{bmatrix} 4 & 3 \\ 5 & 4 \end{bmatrix}$ dan $B = \begin{bmatrix} 7 & 6 \\ 2 & 1 \end{bmatrix}$. Karena $A$ berada di sebelah kanan $X$, maka $X = B \cdot A^{-1}$.</p>
+                                <p><strong>Langkah 2: Cari $A^{-1}$ terlebih dahulu</strong></p>
+                                <div>$$\det(A) = (4)(4) - (3)(5) = 16 - 15 = 1$$</div>
+                                <div>$$A^{-1} = \frac{1}{1} \begin{bmatrix} 4 & -3 \\ -5 & 4 \end{bmatrix} = \begin{bmatrix} 4 & -3 \\ -5 & 4 \end{bmatrix}$$</div>
+                                <p><strong>Langkah 3: Hitung $X = B \cdot A^{-1}$ (Pastikan $B$ di kiri dan $A^{-1}$ di kanan!)</strong></p>
+                                <div>$$X = \begin{bmatrix} 7 & 6 \\ 2 & 1 \end{bmatrix} \begin{bmatrix} 4 & -3 \\ -5 & 4 \end{bmatrix} = \begin{bmatrix} (7)(4) + (6)(-5) & (7)(-3) + (6)(4) \\ (2)(4) + (1)(-5) & (2)(-3) + (1)(4) \end{bmatrix} = \begin{bmatrix} 28 - 30 & -21 + 24 \\ 8 - 5 & -6 + 4 \end{bmatrix} = \begin{bmatrix} -2 & 3 \\ 3 & -2 \end{bmatrix}$$</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================================================
+                     KONTEN BAB 5: INVERS ORDO 3x3 (METODE ADJOIN)
+                ========================================================== -->
+                <div id="topic-content-5" class="topic-panel hidden space-y-6 fade-in">
+                    <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-5 space-y-3">
+                        <h3 class="font-bold text-indigo-950 text-base sm:text-lg">Rangkuman Aturan Bab 5: Invers Matriks Ordo 3×3</h3>
+                        <p class="text-xs sm:text-sm text-slate-700">Rumus utama: $A^{-1} = \frac{1}{\det(A)} \cdot \text{adj}(A)$ melalui 5 tahapan berikut:</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs text-slate-700">
+                            <div class="bg-white p-3 rounded-xl border border-indigo-100">
+                                <span class="font-bold text-indigo-700 block mb-1">1. Determinan</span>
+                                Hitung $\det(A) \neq 0$ via Sarrus atau Ekspansi.
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-indigo-100">
+                                <span class="font-bold text-indigo-700 block mb-1">2. Minor ($M_{ij}$)</span>
+                                Tutup baris-$i$ dan kolom-$j$, hitung det 2×2 tersisa.
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-indigo-100">
+                                <span class="font-bold text-indigo-700 block mb-1">3. Kofaktor ($C_{ij}$)</span>
+                                Kalikan minor dengan pola papan catur $\begin{bmatrix} + & - & + \\ - & + & - \\ + & - & + \end{bmatrix}$.
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-indigo-100">
+                                <span class="font-bold text-indigo-700 block mb-1">4. Adjoin</span>
+                                Transposkan matriks kofaktor: $\text{adj}(A) = C^t$.
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-indigo-100">
+                                <span class="font-bold text-emerald-700 block mb-1">5. Invers ($A^{-1}$)</span>
+                                Kalikan $\text{adj}(A)$ dengan $\frac{1}{\det(A)}$.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contoh Soal Baru Bab 5 -->
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                        <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+                            <span class="font-bold text-indigo-700 text-xs sm:text-sm">CONTOH SOAL REVIEW BAB 5 (Invers Matriks Ordo 3×3 Lengkap)</span>
+                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">Soal Baru</span>
+                        </div>
+                        <div class="p-5 sm:p-6 space-y-4 text-xs sm:text-sm">
+                            <p class="text-slate-800 font-medium leading-relaxed">
+                                Tentukan invers dari matriks segitiga atas berikut:
+                                $$K = \begin{bmatrix} 1 & 2 & 3 \\ 0 & 1 & 4 \\ 0 & 0 & 1 \end{bmatrix}$$
+                            </p>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-slate-700 overflow-x-auto">
+                                <p class="font-bold text-slate-900">Pembahasan Langkah-Demi-Langkah:</p>
+                                <p><strong>Langkah 1: Hitung Determinan $|K|$</strong><br>
+                                Karena $K$ matriks segitiga atas, determinannya adalah perkalian elemen diagonal utamanya: $|K| = (1)(1)(1) = \mathbf{1}$.</p>
+                                
+                                <p><strong>Langkah 2: Hitung ke-9 Minor ($M_{ij}$)</strong></p>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono text-xs bg-white p-3 rounded-lg border border-slate-200">
+                                    <div>$M_{11} = \begin{vmatrix} 1 & 4 \\ 0 & 1 \end{vmatrix} = 1$</div>
+                                    <div>$M_{12} = \begin{vmatrix} 0 & 4 \\ 0 & 1 \end{vmatrix} = 0$</div>
+                                    <div>$M_{13} = \begin{vmatrix} 0 & 1 \\ 0 & 0 \end{vmatrix} = 0$</div>
+                                    <div>$M_{21} = \begin{vmatrix} 2 & 3 \\ 0 & 1 \end{vmatrix} = 2$</div>
+                                    <div>$M_{22} = \begin{vmatrix} 1 & 3 \\ 0 & 1 \end{vmatrix} = 1$</div>
+                                    <div>$M_{23} = \begin{vmatrix} 1 & 2 \\ 0 & 0 \end{vmatrix} = 0$</div>
+                                    <div>$M_{31} = \begin{vmatrix} 2 & 3 \\ 1 & 4 \end{vmatrix} = 8 - 3 = 5$</div>
+                                    <div>$M_{32} = \begin{vmatrix} 1 & 3 \\ 0 & 4 \end{vmatrix} = 4$</div>
+                                    <div>$M_{33} = \begin{vmatrix} 1 & 2 \\ 0 & 1 \end{vmatrix} = 1$</div>
+                                </div>
+
+                                <p><strong>Langkah 3 & 4: Susun Matriks Kofaktor ($C$) lalu Transposkan menjadi $\text{adj}(K)$</strong></p>
+                                <div>$$C = \begin{bmatrix} +1 & -0 & +0 \\ -2 & +1 & -0 \\ +5 & -4 & +1 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ -2 & 1 & 0 \\ 5 & -4 & 1 \end{bmatrix} \implies \text{adj}(K) = C^t = \begin{bmatrix} 1 & -2 & 5 \\ 0 & 1 & -4 \\ 0 & 0 & 1 \end{bmatrix}$$</div>
+
+                                <p class="font-bold text-emerald-800 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                                    Langkah 5: Hitung $K^{-1} = \frac{1}{|K|} \text{adj}(K)$:<br>
+                                    $$K^{-1} = \frac{1}{1} \begin{bmatrix} 1 & -2 & 5 \\ 0 & 1 & -4 \\ 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & -2 & 5 \\ 0 & 1 & -4 \\ 0 & 0 & 1 \end{bmatrix}$$
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =========================================================
+                     KONTEN BAB 6: MENYELESAIKAN SPLDV & SPLTV DENGAN MATRIKS
+                ========================================================== -->
+                <div id="topic-content-6" class="topic-panel hidden space-y-6 fade-in">
+                    <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-5 space-y-3">
+                        <h3 class="font-bold text-indigo-950 text-base sm:text-lg">Rangkuman Aturan Bab 6: Penyelesaian SPLDV & SPLTV</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">Cara 1: Metode Invers Matriks</span>
+                                <p>Ubah sistem persamaan ke bentuk $A \cdot X = B$, di mana $A$ adalah matriks koefisien variabel, $X$ matriks variabel, dan $B$ matriks konstanta.</p>
+                                <p class="font-bold text-indigo-900">Solusi: $X = A^{-1} \cdot B$</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-indigo-100 space-y-1.5">
+                                <span class="font-bold text-indigo-700 block">Cara 2: Metode Determinan (Aturan Cramer)</span>
+                                <p>• $D$ = determinan matriks koefisien utama.</p>
+                                <p>• $D_x, D_y, D_z$ = determinan dengan mengganti kolom koefisien $x, y,$ atau $z$ menggunakan kolom konstanta $B$.</p>
+                                <p class="font-bold text-indigo-900">Solusi: $x = \frac{D_x}{D}, \quad y = \frac{D_y}{D}, \quad z = \frac{D_z}{D}$</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contoh Soal Baru Bab 6 -->
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden">
+                        <div class="bg-slate-50 px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+                            <span class="font-bold text-indigo-700 text-xs sm:text-sm">CONTOH SOAL REVIEW BAB 6 (SPLTV dengan Aturan Cramer)</span>
+                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full font-semibold">Soal Baru</span>
+                        </div>
+                        <div class="p-5 sm:p-6 space-y-4 text-xs sm:text-sm">
+                            <p class="text-slate-800 font-medium leading-relaxed">
+                                Tentukan nilai $x, y,$ dan $z$ dari sistem persamaan linear tiga variabel berikut menggunakan metode determinan matriks:<br>
+                                $\begin{cases} x + y + z = 6 \\ 2x - y + z = 3 \\ x + 2y - z = 2 \end{cases}$
+                            </p>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-slate-700 overflow-x-auto">
+                                <p class="font-bold text-slate-900">Pembahasan Langkah-Demi-Langkah:</p>
+                                <p><strong>Langkah 1: Hitung Determinan Utama ($D$)</strong></p>
+                                <div>$$D = \begin{vmatrix} 1 & 1 & 1 \\ 2 & -1 & 1 \\ 1 & 2 & -1 \end{vmatrix} = [(1)(-1)(-1) + (1)(1)(1) + (1)(2)(2)] - [(1)(-1)(1) + (2)(1)(1) + (-1)(2)(1)] = (1 + 1 + 4) - (-1 + 2 - 2) = 6 - (-1) = \mathbf{7}$$</div>
+                                
+                                <p><strong>Langkah 2: Hitung $D_x$ (ganti kolom-1 dengan konstanta $[6, 3, 2]^t$)</strong></p>
+                                <div>$$D_x = \begin{vmatrix} 6 & 1 & 1 \\ 3 & -1 & 1 \\ 2 & 2 & -1 \end{vmatrix} = [(6)(-1)(-1) + (1)(1)(2) + (1)(3)(2)] - [(2)(-1)(1) + (2)(1)(6) + (-1)(3)(1)] = (6 + 2 + 6) - (-2 + 12 - 3) = 14 - 7 = \mathbf{7}$$</div>
+
+                                <p><strong>Langkah 3: Hitung $D_y$ (ganti kolom-2 dengan konstanta $[6, 3, 2]^t$)</strong></p>
+                                <div>$$D_y = \begin{vmatrix} 1 & 6 & 1 \\ 2 & 3 & 1 \\ 1 & 2 & -1 \end{vmatrix} = [(1)(3)(-1) + (6)(1)(1) + (1)(2)(2)] - [(1)(3)(1) + (2)(1)(1) + (-1)(2)(6)] = (-3 + 6 + 4) - (3 + 2 - 12) = 7 - (-7) = \mathbf{14}$$</div>
+
+                                <p><strong>Langkah 4: Hitung $D_z$ (ganti kolom-3 dengan konstanta $[6, 3, 2]^t$)</strong></p>
+                                <div>$$D_z = \begin{vmatrix} 1 & 1 & 6 \\ 2 & -1 & 3 \\ 1 & 2 & 2 \end{vmatrix} = [(1)(-1)(2) + (1)(3)(1) + (6)(2)(2)] - [(1)(-1)(6) + (2)(3)(1) + (2)(2)(1)] = (-2 + 3 + 24) - (-6 + 6 + 4) = 25 - 4 = \mathbf{21}$$</div>
+
+                                <p class="font-bold text-emerald-800 bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                                    Langkah 5: Tentukan nilai variabel:<br>
+                                    $x = \frac{D_x}{D} = \frac{7}{7} = \mathbf{1}, \quad y = \frac{D_y}{D} = \frac{14}{7} = \mathbf{2}, \quad z = \frac{D_z}{D} = \frac{21}{7} = \mathbf{3}$.<br>
+                                    Himpunan Penyelesaian: $\{(1, 2, 3)\}$.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =================================================================
+             5. LATIHAN SOAL TERBIMBING (GUIDED PRACTICE DENGAN STEP HINTS)
+        ================================================================== -->
+        <section id="latihan" class="scroll-mt-24">
+            <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 sm:p-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-violet-600 text-white font-heading font-bold flex items-center justify-center text-sm">5</span>
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Latihan Soal Terbimbing (Guided Practice)</h2>
+                            <p class="text-xs sm:text-sm text-slate-500">Kerjakan soal-soal menantang berikut. Gunakan tombol <strong>Petunjuk Bertahap</strong> jika mengalami kesulitan!</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1.5 rounded-xl bg-violet-50 border border-violet-200 text-violet-800 text-xs font-bold self-start sm:self-center">
+                        4 Soal Terbimbing Lintas Konsep
+                    </span>
+                </div>
+
+                <div class="space-y-8">
+                    <!-- LATIHAN TERBIMBING 1: Kesamaan, Transpos & Operasi Aljabar -->
+                    <div class="border border-slate-200 rounded-2xl p-5 sm:p-6 bg-slate-50/50 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="px-2.5 py-1 rounded-md bg-indigo-600 text-white text-xs font-bold">Latihan Terbimbing 1 • Kesamaan & Transpos</span>
+                            <span class="text-xs text-slate-500 font-medium">Topik: Bab 1 & Bab 2</span>
+                        </div>
+                        <p class="text-sm sm:text-base text-slate-800 font-medium">
+                            Diketahui matriks $A = \begin{bmatrix} x + y & 2 \\ 3 & x - y \end{bmatrix}$, $B = \begin{bmatrix} 1 & 4 \\ 1 & 2 \end{bmatrix}$, dan $C = \begin{bmatrix} 7 & 4 \\ 6 & 4 \end{bmatrix}$. Jika memenuhi persamaan $A + B^t = C$, berapakah nilai dari $x \cdot y$?
+                        </p>
+
+                        <!-- Kontrol Petunjuk Bertahap -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="revealHint(1, 1)" class="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer">
+                                💡 Petunjuk 1 (Transpos B)
+                            </button>
+                            <button onclick="revealHint(1, 2)" class="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer">
+                                💡 Petunjuk 2 (Sistem Persamaan)
+                            </button>
+                            <button onclick="revealHint(1, 3)" class="px-3 py-1.5 rounded-lg bg-indigo-100 hover:bg-indigo-200 text-indigo-900 text-xs font-semibold transition cursor-pointer">
+                                📖 Lihat Pembahasan Lengkap
+                            </button>
+                        </div>
+
+                        <div id="hint-1-1" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 fade-in">
+                            <strong>Petunjuk 1:</strong> Ubah matriks $B$ menjadi $B^t = \begin{bmatrix} 1 & 1 \\ 4 & 2 \end{bmatrix}$. Lalu jumlahkan $A + B^t$.
+                        </div>
+                        <div id="hint-1-2" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 fade-in">
+                            <strong>Petunjuk 2:</strong> Dari elemen baris 1 kolom 1 didapat $(x + y) + 1 = 7 \implies x + y = 6$. Dari elemen baris 2 kolom 2 didapat $(x - y) + 2 = 4 \implies x - y = 2$. Eliminasi kedua persamaan!
+                        </div>
+                        <div id="hint-1-3" class="hidden p-4 rounded-xl bg-white border border-indigo-200 text-xs sm:text-sm text-slate-700 space-y-1.5 fade-in">
+                            <p class="font-bold text-indigo-700">Pembahasan Lengkap:</p>
+                            <p>$\begin{bmatrix} x + y & 2 \\ 3 & x - y \end{bmatrix} + \begin{bmatrix} 1 & 1 \\ 4 & 2 \end{bmatrix} = \begin{bmatrix} 7 & 4 \\ 6 & 4 \end{bmatrix} \implies \begin{bmatrix} x+y+1 & 3 \\ 7 & x-y+2 \end{bmatrix} = \begin{bmatrix} 7 & 4 \\ 6 & 4 \end{bmatrix}$</p>
+                            <p>Eliminasi: $x + y = 6$ dan $x - y = 2 \implies 2x = 8 \implies x = 4$, sehingga $y = 2$. Maka $x \cdot y = 4 \cdot 2 = \mathbf{8}$.</p>
+                        </div>
+
+                        <!-- Input Cek Jawaban -->
+                        <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-200/80">
+                            <label class="text-xs sm:text-sm font-bold text-slate-700">Jawabanmu ($x \cdot y$) =</label>
+                            <input type="number" id="ans-guided-1" placeholder="Angka..." class="w-28 px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm font-mono font-bold focus:ring-2 focus:ring-violet-500 focus:outline-none">
+                            <button onclick="checkGuided(1, 8)" class="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs sm:text-sm font-bold transition cursor-pointer">
+                                Cek Jawaban
+                            </button>
+                            <span id="status-guided-1" class="text-xs sm:text-sm font-bold"></span>
+                        </div>
+                    </div>
+
+                    <!-- LATIHAN TERBIMBING 2: Determinan & Matriks Singular -->
+                    <div class="border border-slate-200 rounded-2xl p-5 sm:p-6 bg-slate-50/50 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="px-2.5 py-1 rounded-md bg-emerald-600 text-white text-xs font-bold">Latihan Terbimbing 2 • Determinan & Matriks Singular</span>
+                            <span class="text-xs text-slate-500 font-medium">Topik: Bab 3</span>
+                        </div>
+                        <p class="text-sm sm:text-base text-slate-800 font-medium">
+                            Diketahui matriks $P = \begin{bmatrix} 2k - 1 & 4 \\ k + 1 & 3 \end{bmatrix}$ merupakan <strong>matriks singular</strong> (tidak memiliki invers). Tentukan nilai $k$ yang memenuhi!
+                        </p>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="revealHint(2, 1)" class="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer">
+                                💡 Petunjuk 1 (Syarat Singular)
+                            </button>
+                            <button onclick="revealHint(2, 2)" class="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer">
+                                💡 Petunjuk 2 (Persamaan Linear)
+                            </button>
+                            <button onclick="revealHint(2, 3)" class="px-3 py-1.5 rounded-lg bg-indigo-100 hover:bg-indigo-200 text-indigo-900 text-xs font-semibold transition cursor-pointer">
+                                📖 Lihat Pembahasan Lengkap
+                            </button>
+                        </div>
+
+                        <div id="hint-2-1" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 fade-in">
+                            <strong>Petunjuk 1:</strong> Matriks singular memiliki determinan sama dengan nol ($\det(P) = 0$). Gunakan rumus $ad - bc = 0$.
+                        </div>
+                        <div id="hint-2-2" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 fade-in">
+                            <strong>Petunjuk 2:</strong> $(2k - 1)(3) - (4)(k + 1) = 0 \implies (6k - 3) - (4k + 4) = 0$. Hati-hati saat membuka tanda kurung negatif!
+                        </div>
+                        <div id="hint-2-3" class="hidden p-4 rounded-xl bg-white border border-indigo-200 text-xs sm:text-sm text-slate-700 space-y-1.5 fade-in">
+                            <p class="font-bold text-indigo-700">Pembahasan Lengkap:</p>
+                            <p>$\det(P) = 0 \implies (2k - 1)(3) - 4(k + 1) = 0$</p>
+                            <p>$6k - 3 - 4k - 4 = 0 \implies 2k - 7 = 0 \implies 2k = 7 \implies k = \mathbf{3.5}$ (atau $\frac{7}{2}$).</p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-200/80">
+                            <label class="text-xs sm:text-sm font-bold text-slate-700">Jawabanmu ($k$, desimal) =</label>
+                            <input type="number" step="0.1" id="ans-guided-2" placeholder="Contoh: 3.5" class="w-32 px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm font-mono font-bold focus:ring-2 focus:ring-violet-500 focus:outline-none">
+                            <button onclick="checkGuided(2, 3.5)" class="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs sm:text-sm font-bold transition cursor-pointer">
+                                Cek Jawaban
+                            </button>
+                            <span id="status-guided-2" class="text-xs sm:text-sm font-bold"></span>
+                        </div>
+                    </div>
+
+                    <!-- LATIHAN TERBIMBING 3: Invers Matriks 2x2 & Persamaan AX = B -->
+                    <div class="border border-slate-200 rounded-2xl p-5 sm:p-6 bg-slate-50/50 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="px-2.5 py-1 rounded-md bg-sky-600 text-white text-xs font-bold">Latihan Terbimbing 3 • Invers 2×2 & Persamaan Matriks</span>
+                            <span class="text-xs text-slate-500 font-medium">Topik: Bab 4</span>
+                        </div>
+                        <p class="text-sm sm:text-base text-slate-800 font-medium">
+                            Diketahui $\begin{bmatrix} 3 & 5 \\ 1 & 2 \end{bmatrix} X = \begin{bmatrix} 11 & 1 \\ 4 & 0 \end{bmatrix}$. Tentukan keempat elemen matriks $X$!
+                        </p>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="revealHint(3, 1)" class="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer">
+                                💡 Petunjuk 1 (Invers Koefisien)
+                            </button>
+                            <button onclick="revealHint(3, 2)" class="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer">
+                                💡 Petunjuk 2 (Urutan Perkalian)
+                            </button>
+                            <button onclick="revealHint(3, 3)" class="px-3 py-1.5 rounded-lg bg-indigo-100 hover:bg-indigo-200 text-indigo-900 text-xs font-semibold transition cursor-pointer">
+                                📖 Lihat Pembahasan Lengkap
+                            </button>
+                        </div>
+
+                        <div id="hint-3-1" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 fade-in">
+                            <strong>Petunjuk 1:</strong> $\det(A) = (3)(2) - (5)(1) = 1$, sehingga $A^{-1} = \begin{bmatrix} 2 & -5 \\ -1 & 3 \end{bmatrix}$.
+                        </div>
+                        <div id="hint-3-2" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 fade-in">
+                            <strong>Petunjuk 2:</strong> Karena $A$ di sebelah kiri $X$, kalikan $A^{-1}$ dari kiri: $X = \begin{bmatrix} 2 & -5 \\ -1 & 3 \end{bmatrix} \begin{bmatrix} 11 & 1 \\ 4 & 0 \end{bmatrix}$.
+                        </div>
+                        <div id="hint-3-3" class="hidden p-4 rounded-xl bg-white border border-indigo-200 text-xs sm:text-sm text-slate-700 space-y-1.5 fade-in overflow-x-auto">
+                            <p class="font-bold text-indigo-700">Pembahasan Lengkap:</p>
+                            <div>$$X = \begin{bmatrix} 2 & -5 \\ -1 & 3 \end{bmatrix} \begin{bmatrix} 11 & 1 \\ 4 & 0 \end{bmatrix} = \begin{bmatrix} 22 - 20 & 2 + 0 \\ -11 + 12 & -1 + 0 \end{bmatrix} = \begin{bmatrix} 2 & 2 \\ 1 & -1 \end{bmatrix}$$</div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-4 pt-2 border-t border-slate-200/80">
+                            <label class="text-xs sm:text-sm font-bold text-slate-700">Isi Matriks $X$ =</label>
+                            <div class="matrix-input-box bg-white rounded-lg">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="number" id="ans-g3-0" class="w-14 h-9 text-center border border-slate-300 rounded-md font-mono font-bold text-sm">
+                                    <input type="number" id="ans-g3-1" class="w-14 h-9 text-center border border-slate-300 rounded-md font-mono font-bold text-sm">
+                                    <input type="number" id="ans-g3-2" class="w-14 h-9 text-center border border-slate-300 rounded-md font-mono font-bold text-sm">
+                                    <input type="number" id="ans-g3-3" class="w-14 h-9 text-center border border-slate-300 rounded-md font-mono font-bold text-sm">
+                                </div>
+                            </div>
+                            <button onclick="checkGuidedMatrix3()" class="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs sm:text-sm font-bold transition cursor-pointer">
+                                Cek Matriks X
+                            </button>
+                            <span id="status-guided-3" class="text-xs sm:text-sm font-bold"></span>
+                        </div>
+                    </div>
+
+                    <!-- LATIHAN TERBIMBING 4: Invers 3x3 & Aplikasi SPLTV -->
+                    <div class="border border-slate-200 rounded-2xl p-5 sm:p-6 bg-slate-50/50 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="px-2.5 py-1 rounded-md bg-rose-600 text-white text-xs font-bold">Latihan Terbimbing 4 • Invers 3×3 & Penyelesaian SPLTV</span>
+                            <span class="text-xs text-slate-500 font-medium">Topik: Bab 5 & Bab 6</span>
+                        </div>
+                        <p class="text-sm sm:text-base text-slate-800 font-medium leading-relaxed">
+                            Diberikan sistem persamaan linear tiga variabel:<br>
+                            $\begin{cases} x + y + 2z = 9 \\ 2x + 4y - 3z = 1 \\ 3x + 6y - 5z = 0 \end{cases}$<br>
+                            Diketahui determinan matriks koefisiennya adalah $D = -1$. Gunakan Aturan Cramer ($z = \frac{D_z}{D}$) atau invers matriks untuk menentukan <strong>nilai $z$</strong>!
+                        </p>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="revealHint(4, 1)" class="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer">
+                                💡 Petunjuk 1 (Susun Matriks Dz)
+                            </button>
+                            <button onclick="revealHint(4, 2)" class="px-3 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold transition cursor-pointer">
+                                💡 Petunjuk 2 (Hitung Sarrus Dz)
+                            </button>
+                            <button onclick="revealHint(4, 3)" class="px-3 py-1.5 rounded-lg bg-indigo-100 hover:bg-indigo-200 text-indigo-900 text-xs font-semibold transition cursor-pointer">
+                                📖 Lihat Pembahasan Lengkap
+                            </button>
+                        </div>
+
+                        <div id="hint-4-1" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 fade-in">
+                            <strong>Petunjuk 1:</strong> Untuk mencari $D_z$, ganti kolom ke-3 pada matriks koefisien dengan kolom konstanta $[9, 1, 0]^t$, sehingga $D_z = \begin{vmatrix} 1 & 1 & 9 \\ 2 & 4 & 1 \\ 3 & 6 & 0 \end{vmatrix}$.
+                        </div>
+                        <div id="hint-4-2" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 fade-in">
+                            <strong>Petunjuk 2:</strong> Hitung $D_z = [(1)(4)(0) + (1)(1)(3) + (9)(2)(6)] - [(3)(4)(9) + (6)(1)(1) + (0)(2)(1)] = (0 + 3 + 108) - (108 + 6 + 0) = 111 - 114 = -3$. Lalu bagi dengan $D = -1$.
+                        </div>
+                        <div id="hint-4-3" class="hidden p-4 rounded-xl bg-white border border-indigo-200 text-xs sm:text-sm text-slate-700 space-y-1.5 fade-in">
+                            <p class="font-bold text-indigo-700">Pembahasan Lengkap:</p>
+                            <p>Dengan Aturan Cramer: $D_z = 111 - 114 = -3$. Karena $D = -1$, maka $z = \frac{D_z}{D} = \frac{-3}{-1} = \mathbf{3}$.</p>
+                            <p class="text-xs text-slate-500">(Sebagai tambahan: jika dicari lengkap, diperoleh $x = 1$, $y = 2$, dan $z = 3$).</p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-200/80">
+                            <label class="text-xs sm:text-sm font-bold text-slate-700">Jawabanmu ($z$) =</label>
+                            <input type="number" id="ans-guided-4" placeholder="Angka..." class="w-28 px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm font-mono font-bold focus:ring-2 focus:ring-violet-500 focus:outline-none">
+                            <button onclick="checkGuided(4, 3)" class="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs sm:text-sm font-bold transition cursor-pointer">
+                                Cek Jawaban
+                            </button>
+                            <span id="status-guided-4" class="text-xs sm:text-sm font-bold"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-8 px-4 border-t border-slate-800 mt-16">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm">
+            <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-heading font-bold flex items-center justify-center text-xs">[M]</span>
+                <span class="text-slate-200 font-semibold">Modul Review Interaktif Materi Matriks Lengkap</span>
+            </div>
+            <p>Mencakup Konsep Dasar, Operasi, Determinan, Invers 2×2 & 3×3, dan SPL.</p>
+        </div>
+    </footer>
+
+    <!-- =================================================================
+         JAVASCRIPT LOGIKA INTERAKTIF
+    ================================================================== -->
+    <script>
+        // Render KaTeX aman untuk seluruh dokumen atau elemen spesifik
+        function renderAllMath(target = document.body) {
+            if (window.renderMathInElement) {
+                renderMathInElement(target, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false }
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        // Toggle Menu Mobile & Scroll Progress Bar
+        const mobileBtn = document.getElementById('mobile-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+            document.getElementById('scroll-bar').style.width = scrolled + '%';
+        });
+
+        // =============================================================
+        // 1. DATA & LOGIKA 6 SOAL WARM-UP BARU (LINTAS SELURUH BAB)
+        // =============================================================
+        const warmupBank = [
+            {
+                tag: "Soal 1 • Ordo & Transpos",
+                question: "Jika matriks $M = \\begin{bmatrix} 4 & -2 & 7 \\\\ 0 & 5 & -1 \\end{bmatrix}$, maka elemen baris ke-3 kolom ke-2 dari matriks $M^t$ adalah...",
+                options: ["$-2$", "$5$", "$7$", "$-1$"],
+                correctIdx: 3,
+                explanation: "Matriks $M^t = \\begin{bmatrix} 4 & 0 \\\\ -2 & 5 \\\\ 7 & -1 \\end{bmatrix}$. Elemen pada baris ke-3 kolom ke-2 adalah $-1$ (sama dengan elemen baris ke-2 kolom ke-3 matriks $M$)."
+            },
+            {
+                tag: "Soal 2 • Kesamaan Matriks",
+                question: "Diketahui $\\begin{bmatrix} 3p & 5 \\\\ -2 & q+1 \\end{bmatrix} = \\begin{bmatrix} 12 & 5 \\\\ -2 & 7 \\end{bmatrix}$. Nilai dari $p + q$ adalah...",
+                options: ["$8$", "$10$", "$11$", "$12$"],
+                correctIdx: 1,
+                explanation: "Dari $3p = 12 \\implies p = 4$, dan $q + 1 = 7 \\implies q = 6$. Maka $p + q = 4 + 6 = 10$."
+            },
+            {
+                tag: "Soal 3 • Syarat Perkalian Matriks",
+                question: "Matriks $A$ berordo $2 \\times 3$, matriks $B$ berordo $3 \\times 4$, dan matriks $C$ berordo $4 \\times 2$. Ordo matriks hasil dari $(A \\times B) \\times C$ adalah...",
+                options: ["$2 \\times 4$", "$3 \\times 2$", "$2 \\times 2$", "$4 \\times 4$"],
+                correctIdx: 2,
+                explanation: "$A_{2 \\times 3} \\times B_{3 \\times 4}$ menghasilkan matriks berordo $2 \\times 4$. Kemudian dikalikan dengan $C_{4 \\times 2}$ menghasilkan matriks berordo $2 \\times 2$."
+            },
+            {
+                tag: "Soal 4 • Determinan & Sifatnya",
+                question: "Jika matriks $K = \\begin{bmatrix} 5 & 3 \\\\ 2 & 2 \\end{bmatrix}$, berapakah nilai dari $\\det(3K)$?",
+                options: ["$12$", "$36$", "$4$", "$24$"],
+                correctIdx: 1,
+                explanation: "$\\det(K) = (5)(2) - (3)(2) = 10 - 6 = 4$. Karena $K$ berordo $2 \\times 2$, maka $\\det(3K) = 3^2 \\cdot \\det(K) = 9 \\cdot 4 = 36$."
+            },
+            {
+                tag: "Soal 5 • Invers Matriks 2×2",
+                question: "Invers dari matriks $P = \\begin{bmatrix} 7 & 5 \\\\ 4 & 3 \\end{bmatrix}$ adalah...",
+                options: [
+                    "$\\begin{bmatrix} 3 & -5 \\\\ -4 & 7 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 3 & 5 \\\\ 4 & 7 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} -3 & 5 \\\\ 4 & -7 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 7 & -5 \\\\ -4 & 3 \\end{bmatrix}$"
+                ],
+                correctIdx: 0,
+                explanation: "$\\det(P) = (7)(3) - (5)(4) = 21 - 20 = 1$. Tukar diagonal utama ($7$ dan $3$) serta ubah tanda diagonal samping ($-5$ dan $-4$), lalu bagi $1$."
+            },
+            {
+                tag: "Soal 6 • Minor Matriks 3×3",
+                question: "Diketahui $A = \\begin{bmatrix} 2 & 1 & 4 \\\\ 0 & 3 & -2 \\\\ 5 & 1 & 2 \\end{bmatrix}$. Nilai dari kofaktor $C_{12}$ adalah...",
+                options: ["$10$", "$-10$", "$6$", "$-6$"],
+                correctIdx: 1,
+                explanation: "Minor $M_{12} = \\begin{vmatrix} 0 & -2 \\\\ 5 & 2 \\end{vmatrix} = (0)(2) - (-2)(5) = 10$. Karena $C_{12} = (-1)^{1+2} M_{12} = -M_{12}$, maka $C_{12} = -10$."
+            }
+        ];
+
+        let warmupScore = 0;
+        const warmupAnswered = new Set();
+
+        function renderWarmup() {
+            const grid = document.getElementById('warmup-grid');
+            grid.innerHTML = warmupBank.map((item, qIdx) => {
+                const letters = ['A', 'B', 'C', 'D'];
+                const btns = item.options.map((opt, oIdx) => `
+                    <button onclick="answerWarmup(${qIdx}, ${oIdx}, this)" class="w-opt-${qIdx} w-full text-left px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/50 text-xs sm:text-sm transition flex items-center justify-between cursor-pointer">
+                        <span><strong class="text-slate-500 mr-2">${letters[oIdx]}.</strong> ${opt}</span>
+                        <span class="w-icon font-bold"></span>
+                    </button>
+                `).join('');
+
+                return `
+                    <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col justify-between">
+                        <div>
+                            <span class="inline-block px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold mb-2">${item.tag}</span>
+                            <p class="text-slate-800 text-xs sm:text-sm font-medium mb-4 leading-relaxed">${item.question}</p>
+                            <div class="space-y-2">${btns}</div>
+                        </div>
+                        <div id="w-fb-${qIdx}" class="hidden mt-4 p-3 rounded-xl text-xs leading-relaxed fade-in"></div>
+                    </div>
+                `;
+            }).join('');
+            renderAllMath(grid);
+        }
+
+        function answerWarmup(qIdx, oIdx, btnEl) {
+            if (warmupAnswered.has(qIdx)) return;
+            warmupAnswered.add(qIdx);
+
+            const item = warmupBank[qIdx];
+            const allBtns = document.querySelectorAll(`.w-opt-${qIdx}`);
+            const fbEl = document.getElementById(`w-fb-${qIdx}`);
+
+            allBtns.forEach((b, idx) => {
+                b.disabled = true;
+                b.classList.remove('hover:border-indigo-400', 'hover:bg-indigo-50/50');
+                if (idx === item.correctIdx) {
+                    b.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-950', 'font-semibold');
+                    b.querySelector('.w-icon').innerHTML = '<span class="text-emerald-600">✓</span>';
+                }
+            });
+
+            if (oIdx === item.correctIdx) {
+                warmupScore++;
+                document.getElementById('warmup-score').textContent = warmupScore;
+                fbEl.className = "mt-4 p-3 rounded-xl text-xs leading-relaxed bg-emerald-50 border border-emerald-200 text-emerald-900 fade-in";
+                fbEl.innerHTML = `<strong>Tepat Sekali!</strong> ${item.explanation}`;
+            } else {
+                btnEl.classList.add('bg-rose-50', 'border-rose-500', 'text-rose-950');
+                btnEl.querySelector('.w-icon').innerHTML = '<span class="text-rose-600">✕</span>';
+                fbEl.className = "mt-4 p-3 rounded-xl text-xs leading-relaxed bg-rose-50 border border-rose-200 text-rose-900 fade-in";
+                fbEl.innerHTML = `<strong>Kurang Tepat.</strong> ${item.explanation}`;
+            }
+            renderAllMath(fbEl);
+        }
+
+        function resetWarmup() {
+            warmupScore = 0;
+            warmupAnswered.clear();
+            document.getElementById('warmup-score').textContent = "0";
+            renderWarmup();
+        }
+
+        // =============================================================
+        // 2. SIMULASI PENERAPAN NYATA
+        // =============================================================
+        function runCaseSimulation() {
+            const res = document.getElementById('case-sim-result');
+            res.classList.remove('hidden');
+            renderAllMath(res);
+        }
+
+        // =============================================================
+        // 3. TAB NAVIGASI 6 BAB MATERI
+        // =============================================================
+        function selectTopic(num) {
+            document.querySelectorAll('.topic-panel').forEach(panel => panel.classList.add('hidden'));
+            document.querySelectorAll('.topic-tab').forEach(btn => {
+                btn.className = "topic-tab px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer";
+            });
+
+            const activePanel = document.getElementById(`topic-content-${num}`);
+            const activeBtn = document.getElementById(`tab-btn-${num}`);
+            activePanel.classList.remove('hidden');
+            activeBtn.className = "topic-tab px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-indigo-600 text-white shadow-xs transition cursor-pointer";
+            renderAllMath(activePanel);
+        }
+
+        // =============================================================
+        // 4. LATIHAN SOAL TERBIMBING (HINTS & VERIFIKASI JAWABAN)
+        // =============================================================
+        function revealHint(qNum, step) {
+            const el = document.getElementById(`hint-${qNum}-${step}`);
+            el.classList.toggle('hidden');
+            renderAllMath(el);
+        }
+
+        function checkGuided(qNum, expectedVal) {
+            const input = document.getElementById(`ans-guided-${qNum}`);
+            const status = document.getElementById(`status-guided-${qNum}`);
+            const raw = input.value.trim();
+
+            if (raw === "") {
+                status.textContent = "Isi jawabanmu terlebih dahulu!";
+                status.className = "text-xs sm:text-sm font-bold text-amber-600";
+                return;
+            }
+
+            const userVal = parseFloat(raw);
+            if (Math.abs(userVal - expectedVal) < 0.001) {
+                status.textContent = "✓ Benar! Pemahamanmu mantap!";
+                status.className = "text-xs sm:text-sm font-bold text-emerald-600";
+                input.classList.remove('border-rose-500');
+                input.classList.add('border-emerald-500', 'bg-emerald-50');
+            } else {
+                status.textContent = "✕ Belum tepat. Coba buka Petunjuk 1 atau 2 di atas!";
+                status.className = "text-xs sm:text-sm font-bold text-rose-600";
+                input.classList.remove('border-emerald-500', 'bg-emerald-50');
+                input.classList.add('border-rose-500');
+            }
+        }
+
+        function checkGuidedMatrix3() {
+            const expected = [2, 2, 1, -1];
+            const status = document.getElementById('status-guided-3');
+            let allFilled = true;
+            let allCorrect = true;
+
+            for (let i = 0; i < 4; i++) {
+                const el = document.getElementById(`ans-g3-${i}`);
+                if (el.value.trim() === "") {
+                    allFilled = false;
+                    break;
+                }
+                if (parseFloat(el.value) !== expected[i]) {
+                    allCorrect = false;
+                    el.classList.add('border-rose-500', 'bg-rose-50');
+                    el.classList.remove('border-emerald-500', 'bg-emerald-50');
+                } else {
+                    el.classList.add('border-emerald-500', 'bg-emerald-50');
+                    el.classList.remove('border-rose-500', 'bg-rose-50');
+                }
+            }
+
+            if (!allFilled) {
+                status.textContent = "Lengkapi keempat kotak matriks X!";
+                status.className = "text-xs sm:text-sm font-bold text-amber-600";
+            } else if (allCorrect) {
+                status.textContent = "✓ Tepat Sekali! Keempat elemen matriks X benar!";
+                status.className = "text-xs sm:text-sm font-bold text-emerald-600";
+            } else {
+                status.textContent = "✕ Masih ada elemen yang keliru (ditandai merah).";
+                status.className = "text-xs sm:text-sm font-bold text-rose-600";
+            }
+        }
+
+        // Inisialisasi saat halaman siap
+        window.addEventListener('DOMContentLoaded', () => {
+            renderWarmup();
+            renderAllMath();
+        });
+    </script>
+</body>
+</html>
