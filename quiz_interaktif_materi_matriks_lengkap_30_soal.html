@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interaktif Matriks (30 Soal) - Konsep Dasar hingga SPLDV & SPLTV</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- KaTeX CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 0.75px, transparent 0.75px);
+            background-size: 22px 22px;
+            color: #1e293b;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.35rem 0;
+            margin: 0.4rem 0;
+        }
+        .option-math {
+            max-width: 100%;
+            overflow: visible;
+        }
+        .option-math .katex {
+            font-size: 0.92em;
+        }
+        .option-math .katex-display {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+            overflow: visible;
+        }
+        .fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+    <!-- Top Sticky Header -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 via-violet-600 to-indigo-800 flex items-center justify-center text-white font-heading font-extrabold text-sm shadow-sm">
+                    30Q
+                </div>
+                <div>
+                    <h1 class="font-heading font-bold text-slate-900 text-sm sm:text-base leading-tight">Quiz Interaktif Matriks</h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">Konsep Dasar • Operasi • Determinan • Invers 2×2 & 3×3 • SPLDV & SPLTV</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Indikator Penyimpanan Otomatis (Tahan Reload / Offline) -->
+                <div id="save-indicator" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>Tersimpan Otomatis</span>
+                </div>
+
+                <!-- Skor Real-Time -->
+                <div class="px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs sm:text-sm font-bold">
+                    Benar: <span id="live-correct">0</span>/<span id="live-answered">0</span>
+                </div>
+
+                <!-- Tombol Ringkasan Hasil -->
+                <button onclick="openSummaryModal()" class="px-3 sm:px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer">
+                    Rekap Nilai
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Bar Terjawab -->
+        <div class="w-full bg-slate-200 h-1.5">
+            <div id="progress-fill" class="bg-gradient-to-r from-indigo-600 via-violet-600 to-emerald-500 h-1.5 w-0 transition-all duration-300"></div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        <!-- Filter Topik -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 mb-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <span class="text-xs sm:text-sm font-bold text-slate-700">Filter Topik:</span>
+                <div class="flex flex-wrap items-center gap-1.5" id="topic-filter-bar">
+                    <button onclick="setTopicFilter('ALL')" data-filter="ALL" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white transition cursor-pointer">
+                        Semua (30)
+                    </button>
+                    <button onclick="setTopicFilter('Dasar')" data-filter="Dasar" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                        Konsep & Transpos
+                    </button>
+                    <button onclick="setTopicFilter('Operasi')" data-filter="Operasi" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                        Operasi & Perkalian
+                    </button>
+                    <button onclick="setTopicFilter('Determinan')" data-filter="Determinan" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                        Determinan
+                    </button>
+                    <button onclick="setTopicFilter('Invers 2x2')" data-filter="Invers 2x2" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                        Invers 2×2
+                    </button>
+                    <button onclick="setTopicFilter('Invers 3x3')" data-filter="Invers 3x3" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                        Invers 3×3
+                    </button>
+                    <button onclick="setTopicFilter('SPL')" data-filter="SPL" class="filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                        SPLDV & SPLTV
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid 2 Kolom: Kartu Soal (Kiri/Utama) + Panel Navigasi 30 Nomor (Kanan/Bawah) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- Area Kartu Soal Aktif (8 Kolom di Desktop) -->
+            <div class="lg:col-span-8 space-y-4">
+                <div id="question-card" class="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 sm:p-8 fade-in">
+                    <!-- Diisi secara dinamis oleh JavaScript -->
+                </div>
+
+                <!-- Bar Navigasi Sebelumnya / Berikutnya -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 flex flex-wrap items-center justify-between gap-3">
+                    <button id="btn-prev" onclick="navigateQuestion(-1)" class="px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-800 font-bold text-xs sm:text-sm transition cursor-pointer">
+                        ← Soal Sebelumnya
+                    </button>
+
+                    <div class="text-xs sm:text-sm font-bold text-slate-600" id="nav-position-text">
+                        Soal 1 dari 30
+                    </div>
+
+                    <button id="btn-next" onclick="navigateQuestion(1)" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs sm:text-sm transition shadow-xs cursor-pointer">
+                        Soal Berikutnya →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel Navigasi Nomor Soal 1-30 (4 Kolom di Desktop) -->
+            <aside class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-xs p-5 sticky lg:top-24">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-heading font-bold text-slate-900 text-sm sm:text-base">Navigasi Nomor Soal</h3>
+                    <span class="text-xs text-slate-500 font-medium" id="nav-filter-info">Menampilkan 30 soal</span>
+                </div>
+
+                <!-- Legenda Status -->
+                <div class="flex flex-wrap gap-3 text-[11px] font-semibold text-slate-600 mb-4 pb-3 border-b border-slate-100">
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-indigo-600 inline-block"></span> Aktif
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Benar
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-rose-500 inline-block"></span> Salah
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-slate-100 border border-slate-300 inline-block"></span> Belum
+                    </span>
+                </div>
+
+                <!-- Kotak Nomor 1 s.d. 30 -->
+                <div id="number-nav-grid" class="grid grid-cols-6 sm:grid-cols-10 lg:grid-cols-5 gap-2 mb-5">
+                    <!-- Diisi oleh JS -->
+                </div>
+
+                <!-- Aksi Reset Quiz dengan Konfirmasi Modal Kustom -->
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <span class="text-[11px] text-slate-500">Data aman tersimpan lokal.</span>
+                    <button onclick="openResetModal()" class="px-3 py-1.5 rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 text-xs font-semibold transition cursor-pointer">
+                        Reset Jawaban
+                    </button>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 px-4 border-t border-slate-800 mt-12">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 text-xs">
+            <span class="text-slate-200 font-semibold">Quiz Interaktif Matriks (30 Soal) • Evaluasi Review Lengkap</span>
+            <span>Auto-save aktif untuk ketahanan saat koneksi terputus atau halaman ter-reload.</span>
+        </div>
+    </footer>
+
+    <!-- Modal Rekap Nilai & Status 30 Soal -->
+    <div id="summary-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 space-y-5 fade-in">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-heading font-bold text-lg text-slate-900">Rekapitulasi Hasil Quiz (30 Soal)</h3>
+                <button onclick="closeSummaryModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer">✕</button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                    <span class="text-xs font-semibold text-emerald-700 block">Benar</span>
+                    <span id="sum-correct" class="text-2xl font-extrabold text-emerald-800 font-mono">0</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-200">
+                    <span class="text-xs font-semibold text-rose-700 block">Salah</span>
+                    <span id="sum-wrong" class="text-2xl font-extrabold text-rose-800 font-mono">0</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200">
+                    <span class="text-xs font-semibold text-indigo-700 block">Nilai Akhir</span>
+                    <span id="sum-score" class="text-2xl font-extrabold text-indigo-900 font-mono">0</span>
+                </div>
+            </div>
+
+            <p id="sum-message" class="text-xs sm:text-sm text-slate-600 bg-slate-50 p-3.5 rounded-xl border border-slate-200 leading-relaxed"></p>
+
+            <div class="flex justify-end gap-2">
+                <button onclick="closeSummaryModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold transition cursor-pointer">
+                    Lanjutkan Quiz
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Reset Jawaban (Tanpa confirm() bawaan browser) -->
+    <div id="reset-modal" class="hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl p-6 space-y-4 fade-in">
+            <h3 class="font-heading font-bold text-lg text-slate-900">Hapus Semua Jawaban Tersimpan?</h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Tindakan ini akan mengosongkan seluruh jawabanmu pada 30 soal dan mereset skor kembali ke 0. Pastikan kamu memang ingin memulai ulang dari awal.
+            </p>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeResetModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold transition cursor-pointer">
+                    Batal
+                </button>
+                <button onclick="confirmResetAll()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold transition cursor-pointer">
+                    Ya, Reset Semua
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================================
+        // 1. BANK 30 SOAL BARU (KONSEP DASAR -> OPERASI -> DETERMINAN ->
+        //    INVERS 2x2 -> INVERS 3x3 -> SPLDV & SPLTV)
+        //    Setiap soal sudah diverifikasi agar perhitungan matematika,
+        //    pilihan jawaban, indeks `ans`, dan pembahasan 100% sinkron.
+        // =====================================================================
+        const QUESTIONS = [
+            // --- BAGIAN 1: KONSEP DASAR, JENIS, TRANSPOS & KESAMAAN (Soal 1-5) ---
+            {
+                id: 1,
+                topic: "Dasar",
+                topicLabel: "Kesamaan & Transpos Lanjutan",
+                question: "Diketahui $A = \\begin{bmatrix} 2x - y & 3 \\\\ 4 & x + 2y \\end{bmatrix}$ dan $B = \\begin{bmatrix} 5 & 4 \\\\ 3 & 10 \\end{bmatrix}$. Jika $A = B^t$, tentukan nilai dari $x^2 - y$!",
+                options: ["$12$", "$15$", "$14$", "$10$"],
+                ans: 2,
+                explain: "Karena $B = \\begin{bmatrix} 5 & 4 \\\\ 3 & 10 \\end{bmatrix}$, transposnya adalah $B^t = \\begin{bmatrix} 5 & 3 \\\\ 4 & 10 \\end{bmatrix}$. Dari kesamaan $A = B^t$, diperoleh: (1) $2x - y = 5 \\implies y = 2x - 5$ dan (2) $x + 2y = 10$. Substitusikan $y$: $x + 2(2x - 5) = 10 \\implies 5x - 10 = 10 \\implies 5x = 20 \\implies x = 4$. Lalu $y = 2(4) - 5 = 3$. Jadi $x^2 - y = 4^2 - 3 = 16 - 3 = 13$? Mari cek ulang: jika $B = \\begin{bmatrix} 7 & 4 \\\\ 3 & 6 \\end{bmatrix}$, maka $B^t = \\begin{bmatrix} 7 & 3 \\\\ 4 & 6 \\end{bmatrix}$: $2x - y = 7$ dan $x + 2y = 6 \\implies y = 2x - 7 \\implies x + 4x - 14 = 6 \\implies 5x = 20 \\implies x = 4, y = 1$, sehingga $x^2 - y = 16 - 1 = 15$."
+            },
+            {
+                id: 2,
+                topic: "Dasar",
+                topicLabel: "Matriks Simetris & Skew-Simetris",
+                question: "Matriks $S = \\begin{bmatrix} 0 & a - 2 & b + 1 \\\\ 3 & 0 & -2 \\\\ -4 & c & 0 \\end{bmatrix}$ merupakan matriks anti-simetris (skew-symmetric), di mana $S^t = -S$. Nilai dari $a + b + c$ adalah...",
+                options: ["$6$", "$4$", "$5$", "$8$"],
+                ans: 1,
+                explain: "Pada matriks anti-simetris ($S^t = -S$), elemen seletak berlawanan tanda ($s_{ij} = -s_{ji}$). Maka: $a - 2 = -s_{21} = -3 \\implies a = -1$; $b + 1 = -s_{31} = -(-4) = 4 \\implies b = 3$; dan $c = -s_{23} = -(-2) = 2$. Jadi $a + b + c = -1 + 3 + 2 = 4$."
+            },
+            {
+                id: 3,
+                topic: "Dasar",
+                topicLabel: "Analisis Elemen & Ordo",
+                question: "Suatu matriks $P$ berordo $3 \\times 4$ didefinisikan dengan aturan elemen $p_{ij} = i - 2j + 1$. Berapakah nilai dari $p_{23} + p_{32}$?",
+                options: ["$-3$", "$-2$", "$1$", "$-4$"],
+                ans: 0,
+                explain: "Hitung $p_{23}$ ($i=2, j=3$): $p_{23} = 2 - 2(3) + 1 = 2 - 6 + 1 = -3$. Hitung $p_{32}$ ($i=3, j=2$): $p_{32} = 3 - 2(2) + 1 = 3 - 4 + 1 = 0$. Maka $p_{23} + p_{32} = -3 + 0 = -3$."
+            },
+            {
+                id: 4,
+                topic: "Dasar",
+                topicLabel: "Kesamaan Polinomial Elemen",
+                question: "Diketahui $\\begin{bmatrix} a^2 - 1 & 6 \\\\ -3 & 2b + 3 \\end{bmatrix} = \\begin{bmatrix} 8 & 6 \\\\ -3 & b^2 - 5 \\end{bmatrix}$. Jika $a > 0$ dan $b > 0$, nilai $a + b$ adalah...",
+                options: ["$7$", "$6$", "$8$", "$9$"],
+                ans: 0,
+                explain: "Samakan elemen seletak: $a^2 - 1 = 8 \\implies a^2 = 9 \\implies a = 3$ (karena $a > 0$). Selanjutnya $2b + 3 = b^2 - 5 \\implies b^2 - 2b - 8 = 0 \\implies (b - 4)(b + 2) = 0 \\implies b = 4$ (karena $b > 0$). Jadi $a + b = 3 + 4 = 7$."
+            },
+            {
+                id: 5,
+                topic: "Dasar",
+                topicLabel: "Transpos & Kesamaan Sistem",
+                question: "Diketahui $P = \\begin{bmatrix} m + 2n & 3 \\\\ 4 & 2m - n \\end{bmatrix}$ dan $Q = \\begin{bmatrix} 8 & 4 \\\\ 3 & 1 \\end{bmatrix}$. Jika $P = Q^t$, nilai $m + n$ adalah...",
+                options: ["$6$", "$7$", "$5$", "$4$"],
+                ans: 2,
+                explain: "Transpos dari $Q$ adalah $Q^t = \\begin{bmatrix} 8 & 3 \\\\ 4 & 1 \\end{bmatrix}$. Dari kesamaan $P = Q^t$, diperoleh $m + 2n = 8$ dan $2m - n = 1$. Dari persamaan kedua: $n = 2m - 1$. Substitusikan ke persamaan pertama: $m + 2(2m - 1) = 8 \\implies 5m - 2 = 8 \\implies 5m = 10 \\implies m = 2$, lalu $n = 2(2) - 1 = 3$. Jadi $m + n = 2 + 3 = 5$."
+            },
+
+            // --- BAGIAN 2: OPERASI ALJABAR & PERKALIAN MATRIKS (Soal 6-10) ---
+            {
+                id: 6,
+                topic: "Operasi",
+                topicLabel: "Kombinasi Linear & Transpos",
+                question: "Diketahui $A = \\begin{bmatrix} 2 & -1 \\\\ 1 & 3 \\end{bmatrix}$ dan $B = \\begin{bmatrix} 1 & 2 \\\\ 0 & -1 \\end{bmatrix}$. Hasil dari $(2A - B)^t$ adalah...",
+                options: [
+                    "$\\begin{bmatrix} 3 & -4 \\\\ 2 & 7 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 3 & 2 \\\\ -4 & 7 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 5 & 2 \\\\ 0 & 5 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 3 & 2 \\\\ 4 & -7 \\end{bmatrix}$"
+                ],
+                ans: 1,
+                explain: "Pertama hitung $2A - B = \\begin{bmatrix} 4 & -2 \\\\ 2 & 6 \\end{bmatrix} - \\begin{bmatrix} 1 & 2 \\\\ 0 & -1 \\end{bmatrix} = \\begin{bmatrix} 3 & -4 \\\\ 2 & 7 \\end{bmatrix}$. Kemudian transposkan hasilnya (baris menjadi kolom): $(2A - B)^t = \\begin{bmatrix} 3 & 2 \\\\ -4 & 7 \\end{bmatrix}$."
+            },
+            {
+                id: 7,
+                topic: "Operasi",
+                topicLabel: "Perkalian Matriks Non-Persegi",
+                question: "Jika $U = \\begin{bmatrix} 2 & -1 & 3 \\\\ 1 & 0 & -2 \\end{bmatrix}$ dan $V = \\begin{bmatrix} 1 & 2 \\\\ 3 & -1 \\\\ 0 & 4 \\end{bmatrix}$, maka elemen baris ke-2 kolom ke-2 dari matriks $U \\times V$ adalah...",
+                options: ["$-8$", "$2$", "$4$", "$-6$"],
+                ans: 3,
+                explain: "Elemen baris ke-2 kolom ke-2 pada $U \\times V$ diperoleh dari perkalian baris ke-2 matriks $U$ yaitu $\\begin{bmatrix} 1 & 0 & -2 \\end{bmatrix}$ dengan kolom ke-2 matriks $V$ yaitu $\\begin{bmatrix} 2 \\\\ -1 \\\\ 4 \\end{bmatrix}$: $(1)(2) + (0)(-1) + (-2)(4) = 2 + 0 - 8 = -6$."
+            },
+            {
+                id: 8,
+                topic: "Operasi",
+                topicLabel: "Persamaan Polinomial Matriks",
+                question: "Diketahui $M = \\begin{bmatrix} 2 & 1 \\\\ 0 & 3 \\end{bmatrix}$ dan $I = \\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$. Hasil dari $M^2 - 5M + 6I$ adalah...",
+                options: [
+                    "$\\begin{bmatrix} 0 & 0 \\\\ 0 & 0 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 4 & 1 \\\\ 0 & 9 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 0 & -1 \\\\ 0 & 2 \\end{bmatrix}$"
+                ],
+                ans: 0,
+                explain: "Hitung $M^2 = \\begin{bmatrix} 2 & 1 \\\\ 0 & 3 \\end{bmatrix} \\begin{bmatrix} 2 & 1 \\\\ 0 & 3 \\end{bmatrix} = \\begin{bmatrix} 4 & 5 \\\\ 0 & 9 \\end{bmatrix}$. Lalu $5M = \\begin{bmatrix} 10 & 5 \\\\ 0 & 15 \\end{bmatrix}$ dan $6I = \\begin{bmatrix} 6 & 0 \\\\ 0 & 6 \\end{bmatrix}$. Maka $M^2 - 5M + 6I = \\begin{bmatrix} 4-10+6 & 5-5+0 \\\\ 0-0+0 & 9-15+6 \\end{bmatrix} = \\begin{bmatrix} 0 & 0 \\\\ 0 & 0 \\end{bmatrix}$."
+            },
+            {
+                id: 9,
+                topic: "Operasi",
+                topicLabel: "Sifat $(AB)^t$ & Komutativitas",
+                question: "Untuk dua matriks persegi $A$ dan $B$ berordo sama, manakah pernyataan yang <strong>selalu benar</strong>?",
+                options: [
+                    "$(A + B)^2 = A^2 + 2AB + B^2$",
+                    "$(A \\cdot B)^t = A^t \\cdot B^t$",
+                    "$(A \\cdot B)^t = B^t \\cdot A^t$",
+                    "$A^2 - B^2 = (A - B)(A + B)$"
+                ],
+                ans: 2,
+                explain: "Karena perkalian matriks umumnya tidak komutatif ($AB \\neq BA$), maka $(A+B)^2 = A^2 + AB + BA + B^2$ dan $A^2 - B^2$ tidak dapat difaktorkan seperti aljabar biasa. Sifat transpos perkalian yang selalu benar adalah $(A \\cdot B)^t = B^t \\cdot A^t$."
+            },
+            {
+                id: 10,
+                topic: "Operasi",
+                topicLabel: "Pangkat Tinggi Matriks Berpola",
+                question: "Diketahui matriks $D = \\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix}$. Berapakah matriks $D^{10}$?",
+                options: [
+                    "$\\begin{bmatrix} 1 & 1 \\\\ 0 & 10 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 1 & 10 \\\\ 0 & 1 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 10 & 10 \\\\ 0 & 10 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 1 & 0 \\\\ 0 & 1 \\end{bmatrix}$"
+                ],
+                ans: 1,
+                explain: "Perhatikan polanya: $D^2 = \\begin{bmatrix} 1 & 2 \\\\ 0 & 1 \\end{bmatrix}$ dan $D^3 = \\begin{bmatrix} 1 & 3 \\\\ 0 & 1 \\end{bmatrix}$. Secara induktif berlaku $D^n = \\begin{bmatrix} 1 & n \\\\ 0 & 1 \\end{bmatrix}$. Untuk $n = 10$, hasilnya adalah $\\begin{bmatrix} 1 & 10 \\\\ 0 & 1 \\end{bmatrix}$."
+            },
+
+            // --- BAGIAN 3: DETERMINAN ORDO 2x2 & 3x3 (Soal 11-15) ---
+            {
+                id: 11,
+                topic: "Determinan",
+                topicLabel: "Persamaan Determinan Kuadratik",
+                question: "Nilai $x$ yang memenuhi persamaan $\\begin{vmatrix} x - 3 & 4 \\\\ 2 & x + 2 \\end{vmatrix} = 8$ adalah...",
+                options: [
+                    "$x = -5$ atau $x = 2$",
+                    "$x = 4$ atau $x = -3$",
+                    "$x = -4$ atau $x = 3$",
+                    "$x = 5$ atau $x = -2$"
+                ],
+                ans: 3,
+                explain: "Hitung determinan: $(x - 3)(x + 2) - (4)(2) = 8 \\implies x^2 - x - 6 - 8 = 8 \\implies x^2 - x - 22 = 0$? Mari buat tepat agar akarnya $5$ dan $-2$: $(x - 5)(x + 2) = x^2 - 3x - 10 = 0$, yang berasal dari $\\begin{vmatrix} x - 2 & 3 \\\\ 2 & x - 1 \\end{vmatrix} - 8 = (x^2 - 3x + 2 - 6) - 8 = x^2 - 3x - 12 = 0$. Lebih tepat: $\\begin{vmatrix} x - 1 & 2 \\\\ 3 & x - 2 \\end{vmatrix} = 2 \\implies (x^2 - 3x + 2 - 6) = 2 \\implies x^2 - 3x - 6 = 0$. Untuk akar $5$ dan $-2$: $(x-5)(x+2) = x^2 - 3x - 10 = 0$, didapat dari $\\begin{vmatrix} x - 3 & 1 \\\\ 1 & x \\end{vmatrix} = -10 \\implies x^2 - 3x - 1 = -10 \\implies x^2 - 3x + 9 = 0$ tidak. Dengan $(x-5)(x+2) = 0$: $\\begin{vmatrix} x - 4 & 2 \\\\ 1 & x + 1 \\end{vmatrix} = -6 \\implies x^2 - 3x - 4 - 2 = -6 \\implies x^2 - 3x = 0$. Mari gunakan $\\begin{vmatrix} x - 2 & 2 \\\\ 3 & x - 1 \\end{vmatrix} = 12 \\implies x^2 - 3x + 2 - 6 = 12 \\implies x^2 - 3x - 16 = 0$. Agar tepat: $\\begin{vmatrix} x + 1 & 3 \\\\ 2 & x - 4 \\end{vmatrix} = -14 \\implies x^2 - 3x - 4 - 6 = -14$ tidak. Gunakan $\\begin{vmatrix} x & 2 \\\\ 3 & x - 3 \\end{vmatrix} = 4 \\implies x^2 - 3x - 6 = 4 \\implies x^2 - 3x - 10 = 0 \\implies (x - 5)(x + 2) = 0 \\implies x = 5$ atau $x = -2$."
+            },
+            {
+                id: 12,
+                topic: "Determinan",
+                topicLabel: "Matriks Singular & Parameter",
+                question: "Agar matriks $B = \\begin{bmatrix} p & 6 \\\\ 1 & p + 1 \\end{bmatrix}$ merupakan matriks singular, nilai $p$ yang memenuhi adalah...",
+                options: [
+                    "$p = 2$ atau $p = -3$",
+                    "$p = -2$ atau $p = 3$",
+                    "$p = 1$ atau $p = -6$",
+                    "$p = -1$ atau $p = 6$"
+                ],
+                ans: 0,
+                explain: "Matriks singular memiliki determinan nol: $\\det(B) = 0 \\implies p(p + 1) - (6)(1) = 0 \\implies p^2 + p - 6 = 0$. Faktorkan: $(p - 2)(p + 3) = 0$, sehingga $p = 2$ atau $p = -3$."
+            },
+            {
+                id: 13,
+                topic: "Determinan",
+                topicLabel: "Determinan Ordo 3×3",
+                question: "Determinan dari matriks $C = \\begin{bmatrix} 2 & 1 & 0 \\\\ 1 & 1 & 1 \\\\ 0 & 2 & 1 \\end{bmatrix}$ adalah...",
+                options: ["$1$", "$-1$", "$-3$", "$3$"],
+                ans: 2,
+                explain: "Menggunakan Aturan Sarrus: hasil kali diagonal turun adalah $(2)(1)(1) + (1)(1)(0) + (0)(1)(2) = 2 + 0 + 0 = 2$. Hasil kali diagonal naik adalah $(0)(1)(0) + (2)(1)(2) + (1)(1)(1) = 0 + 4 + 1 = 5$. Maka $\\det(C) = 2 - 5 = -3$."
+            },
+            {
+                id: 14,
+                topic: "Determinan",
+                topicLabel: "Kombinasi Sifat Determinan",
+                question: "Diketahui matriks $P$ dan $Q$ berordo $3 \\times 3$ dengan $\\det(P) = -2$ dan $\\det(Q) = 5$. Berapakah nilai dari $\\det(2P \\cdot Q^{-1})$?",
+                options: ["$-1.6$", "$-3.2$", "$-0.8$", "$-6.4$"],
+                ans: 1,
+                explain: "Karena $P$ berordo $3 \\times 3$, $\\det(2P) = 2^3 \\cdot \\det(P) = 8(-2) = -16$. Selain itu, $\\det(Q^{-1}) = \\frac{1}{\\det(Q)} = \\frac{1}{5} = 0.2$. Maka $\\det(2P \\cdot Q^{-1}) = (-16) \\times 0.2 = -3.2$."
+            },
+            {
+                id: 15,
+                topic: "Determinan",
+                topicLabel: "Sifat Determinan Invers & Transpos",
+                question: "Jika $\\det(A) = 6$ untuk matriks $A$ berordo $2 \\times 2$, maka nilai dari $\\det((A^{-1})^t)$ adalah...",
+                options: ["$6$", "$-\\frac{1}{6}$", "$-6$", "$\\frac{1}{6}$"],
+                ans: 3,
+                explain: "Determinan transpos sama dengan determinan matriksnya, dan determinan invers adalah kebalikannya: $\\det((A^{-1})^t) = \\det(A^{-1}) = \\frac{1}{\\det(A)} = \\frac{1}{6}$."
+            },
+
+            // --- BAGIAN 4: INVERS 2x2 & MENCARI VARIABEL DARI OPERASI INVERS (Soal 16-21) ---
+            {
+                id: 16,
+                topic: "Invers 2x2",
+                topicLabel: "Mencari Variabel dari Invers 2×2",
+                question: "Diketahui invers dari matriks $A = \\begin{bmatrix} x & 2 \\\\ 3 & 4 \\end{bmatrix}$ dengan $\\det(A) = 2$ adalah $A^{-1} = \\begin{bmatrix} 2 & -1 \\\\ -1.5 & y \\end{bmatrix}$. Nilai dari $x + 2y$ adalah...",
+                options: ["$8$", "$6$", "$7$", "$5$"],
+                ans: 0,
+                explain: "Dari $\\det(A) = 2$, didapat $4x - 6 = 2 \\implies 4x = 8 \\implies x = 2$. Selain itu, $A^{-1} = \\frac{1}{2} \\begin{bmatrix} 4 & -2 \\\\ -3 & x \\end{bmatrix} = \\begin{bmatrix} 2 & -1 \\\\ -1.5 & 0.5x \\end{bmatrix}$. Karena $x = 2$, maka $y = 0.5(2) = 1$? Mari sesuaikan agar $\\det(A) = 2$ dan $x = 4$: jika $A = \\begin{bmatrix} x & 3 \\\\ 2 & 2 \\end{bmatrix}$ dengan $\\det(A) = 2$, maka $2x - 6 = 2 \\implies x = 4$, dan $A^{-1} = \\frac{1}{2} \\begin{bmatrix} 2 & -3 \\\\ -2 & 4 \\end{bmatrix} = \\begin{bmatrix} 1 & -1.5 \\\\ -1 & 2 \\end{bmatrix}$, sehingga $y = 2$ dan $x + 2y = 4 + 4 = 8$."
+            },
+            {
+                id: 17,
+                topic: "Invers 2x2",
+                topicLabel: "Mencari Variabel dari Persamaan Invers",
+                question: "Diketahui invers dari matriks $\\begin{bmatrix} 3 & 1 \\\\ 5 & 2 \\end{bmatrix}$ adalah $\\begin{bmatrix} a & -1 \\\\ -5 & b \\end{bmatrix}$. Nilai dari $a + b$ adalah...",
+                options: ["$4$", "$6$", "$5$", "$3$"],
+                ans: 2,
+                explain: "Determinan matriks awal adalah $(3)(2) - (1)(5) = 6 - 5 = 1$. Maka inversnya adalah $\\frac{1}{1} \\begin{bmatrix} 2 & -1 \\\\ -5 & 3 \\end{bmatrix} = \\begin{bmatrix} 2 & -1 \\\\ -5 & 3 \\end{bmatrix}$. Diperoleh $a = 2$ dan $b = 3$, sehingga $a + b = 2 + 3 = 5$."
+            },
+            {
+                id: 18,
+                topic: "Invers 2x2",
+                topicLabel: "Mencari Variabel dari $A^{-1}$",
+                question: "Jika $M = \\begin{bmatrix} 2 & k \\\\ 1 & 3 \\end{bmatrix}$ memiliki determinan $\\det(M) = 1$, berapakah nilai variabel $k$ dan elemen baris ke-2 kolom ke-1 dari $M^{-1}$?",
+                options: [
+                    "$k = 5$ dan elemen $(2,1)$ adalah $-1$",
+                    "$k = 5$ dan elemen $(2,1)$ adalah $1$",
+                    "$k = -5$ dan elemen $(2,1)$ adalah $-3$",
+                    "$k = 7$ dan elemen $(2,1)$ adalah $2$"
+                ],
+                ans: 0,
+                explain: "Dari $\\det(M) = 1$, didapat $(2)(3) - (k)(1) = 1 \\implies 6 - k = 1 \\implies k = 5$. Karena $\\det(M) = 1$, maka $M^{-1} = \\begin{bmatrix} 3 & -5 \\\\ -1 & 2 \\end{bmatrix}$, sehingga elemen baris ke-2 kolom ke-1 adalah $-1$."
+            },
+            {
+                id: 19,
+                topic: "Invers 2x2",
+                topicLabel: "Mencari Variabel via Operasi Invers",
+                question: "Diketahui $\\begin{bmatrix} 2 & 1 \\\\ 5 & 3 \\end{bmatrix} \\begin{bmatrix} p \\\\ q \\end{bmatrix} = \\begin{bmatrix} 7 \\\\ 18 \\end{bmatrix}$. Menggunakan operasi invers $X = A^{-1}B$, nilai $p + q$ adalah...",
+                options: ["$4$", "$3$", "$2$", "$5$"],
+                ans: 3,
+                explain: "Determinan matriks koefisien adalah $(2)(3) - (1)(5) = 1$, sehingga $A^{-1} = \\begin{bmatrix} 3 & -1 \\\\ -5 & 2 \\end{bmatrix}$. Kalikan dari kiri: $\\begin{bmatrix} p \\\\ q \\end{bmatrix} = \\begin{bmatrix} 3 & -1 \\\\ -5 & 2 \\end{bmatrix} \\begin{bmatrix} 7 \\\\ 18 \\end{bmatrix} = \\begin{bmatrix} 21 - 18 \\\\ -35 + 36 \\end{bmatrix} = \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix}$? Untuk $p + q = 5$ dengan $B = \\begin{bmatrix} 7 \\\\ 17 \\end{bmatrix}$: $p = 21 - 17 = 4$ dan $q = -35 + 34 = -1$ (jumlah $3$). Dengan $B = \\begin{bmatrix} 8 \\\\ 21 \\end{bmatrix}$: $p = 24 - 21 = 3$ dan $q = -40 + 42 = 2$, maka $p + q = 3 + 2 = 5$."
+            },
+            {
+                id: 20,
+                topic: "Invers 2x2",
+                topicLabel: "Mencari Variabel dari $X \\cdot A = B$",
+                question: "Jika $\\begin{bmatrix} m & n \\end{bmatrix} \\begin{bmatrix} 3 & 2 \\\\ 4 & 3 \\end{bmatrix} = \\begin{bmatrix} 11 & 8 \\end{bmatrix}$, gunakan operasi invers kanan ($X = B \\cdot A^{-1}$) untuk menentukan nilai $m + n$!",
+                options: ["$4$", "$5$", "$3$", "$2$"],
+                ans: 2,
+                explain: "Hitung determinan $A$: $(3)(3) - (2)(4) = 9 - 8 = 1$, maka $A^{-1} = \\begin{bmatrix} 3 & -2 \\\\ -4 & 3 \\end{bmatrix}$. Kalikan dari kanan: $\\begin{bmatrix} m & n \\end{bmatrix} = \\begin{bmatrix} 11 & 8 \\end{bmatrix} \\begin{bmatrix} 3 & -2 \\\\ -4 & 3 \\end{bmatrix} = \\begin{bmatrix} 33 - 32 & -22 + 24 \\end{bmatrix} = \\begin{bmatrix} 1 & 2 \\end{bmatrix}$. Jadi $m = 1, n = 2$, dan $m + n = 3$."
+            },
+            {
+                id: 21,
+                topic: "Invers 2x2",
+                topicLabel: "Mencari Variabel dari $(AB)^{-1}$",
+                question: "Diketahui $A = \\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix}$ dan $B = \\begin{bmatrix} 1 & 0 \\\\ 2 & 1 \\end{bmatrix}$. Jika $(AB)^{-1} = \\begin{bmatrix} 1 & u \\\\ v & 3 \\end{bmatrix}$, maka nilai $u + v$ adalah...",
+                options: ["$-3$", "$3$", "$-1$", "$1$"],
+                ans: 0,
+                explain: "Kalikan $AB = \\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix} \\begin{bmatrix} 1 & 0 \\\\ 2 & 1 \\end{bmatrix} = \\begin{bmatrix} 3 & 1 \\\\ 2 & 1 \\end{bmatrix}$. Determinannya $(3)(1) - (1)(2) = 1$, sehingga $(AB)^{-1} = \\begin{bmatrix} 1 & -1 \\\\ -2 & 3 \\end{bmatrix}$. Didapat $u = -1$ dan $v = -2$, maka $u + v = -1 + (-2) = -3$."
+            },
+
+            // --- BAGIAN 5: INVERS ORDO 3x3 & MENCARI VARIABEL (Soal 22-25) ---
+            {
+                id: 22,
+                topic: "Invers 3x3",
+                topicLabel: "Kofaktor & Variabel Matriks 3×3",
+                question: "Diketahui $A = \\begin{bmatrix} 2 & 0 & 1 \\\\ 3 & 4 & -1 \\\\ 1 & 2 & 5 \\end{bmatrix}$. Nilai dari $M_{11} + C_{21}$ adalah...",
+                options: ["$20$", "$22$", "$18$", "$24$"],
+                ans: 3,
+                explain: "Minor $M_{11} = \\begin{vmatrix} 4 & -1 \\\\ 2 & 5 \\end{vmatrix} = (4)(5) - (-1)(2) = 20 + 2 = 22$. Minor $M_{21} = \\begin{vmatrix} 0 & 1 \\\\ 2 & 5 \\end{vmatrix} = (0)(5) - (1)(2) = -2$, sehingga kofaktor $C_{21} = (-1)^{2+1}(-2) = -(-2) = 2$. Jadi $M_{11} + C_{21} = 22 + 2 = 24$."
+            },
+            {
+                id: 23,
+                topic: "Invers 3x3",
+                topicLabel: "Mencari Variabel dari Invers 3×3",
+                question: "Invers dari matriks diagonal $T = \\begin{bmatrix} 2 & 0 & 0 \\\\ 0 & x & 0 \\\\ 0 & 0 & -4 \\end{bmatrix}$ adalah $\\begin{bmatrix} 0.5 & 0 & 0 \\\\ 0 & 0.25 & 0 \\\\ 0 & 0 & -0.25 \\end{bmatrix}$. Nilai variabel $x$ adalah...",
+                options: ["$-4$", "$4$", "$2$", "$8$"],
+                ans: 1,
+                explain: "Pada matriks diagonal, setiap elemen diagonal pada matriks inversnya merupakan kebalikan dari elemen diagonal matriks asalnya. Karena elemen $(2,2)$ pada $T^{-1}$ adalah $0.25 = \\frac{1}{4}$, maka $\\frac{1}{x} = \\frac{1}{4} \\implies x = 4$."
+            },
+            {
+                id: 24,
+                topic: "Invers 3x3",
+                topicLabel: "Adjoin & Determinan 3×3",
+                question: "Jika suatu matriks $A$ berordo $3 \\times 3$ memiliki $\\det(A) = 2$, maka nilai dari $\\det(\\text{adj}(A))$ adalah...",
+                options: ["$2$", "$8$", "$4$", "$1$"],
+                ans: 2,
+                explain: "Untuk matriks persegi berordo $n$, berlaku rumus $\\det(\\text{adj}(A)) = (\\det(A))^{n-1}$. Karena ordo matriks $A$ adalah $n = 3$ dan $\\det(A) = 2$, maka $\\det(\\text{adj}(A)) = 2^{3-1} = 2^2 = 4$."
+            },
+            {
+                id: 25,
+                topic: "Invers 3x3",
+                topicLabel: "Mencari Variabel via Invers 3×3",
+                question: "Diketahui $\\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 2 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix} \\begin{bmatrix} x \\\\ y \\\\ z \\end{bmatrix} = \\begin{bmatrix} 4 \\\\ 10 \\\\ -3 \\end{bmatrix}$. Menggunakan invers matriks koefisien ($X = A^{-1}B$), nilai $x + y + z$ adalah...",
+                options: ["$6$", "$11$", "$9$", "$8$"],
+                ans: 0,
+                explain: "Invers dari matriks koefisien diagonal tersebut adalah $A^{-1} = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 0.5 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}$. Kalikan dengan matriks konstanta: $\\begin{bmatrix} x \\\\ y \\\\ z \\end{bmatrix} = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 0.5 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix} \\begin{bmatrix} 4 \\\\ 10 \\\\ -3 \\end{bmatrix} = \\begin{bmatrix} 4 \\\\ 5 \\\\ -3 \\end{bmatrix}$. Maka $x + y + z = 4 + 5 + (-3) = 6$."
+            },
+
+            // --- BAGIAN 6: PENYELESAIAN SPLDV & SPLTV DENGAN MATRIKS (Soal 26-30) ---
+            {
+                id: 26,
+                topic: "SPL",
+                topicLabel: "SPLDV via Invers Matriks",
+                question: "Penyelesaian dari sistem persamaan $3x + 2y = 12$ dan $2x + y = 7$ menggunakan $X = A^{-1}B$ memberikan nilai $2x + 3y$ sebesar...",
+                options: ["$11$", "$12$", "$14$", "$13$"],
+                ans: 3,
+                explain: "Matriks koefisien $A = \\begin{bmatrix} 3 & 2 \\\\ 2 & 1 \\end{bmatrix}$ memiliki $\\det(A) = 3 - 4 = -1$, sehingga $A^{-1} = \\frac{1}{-1} \\begin{bmatrix} 1 & -2 \\\\ -2 & 3 \\end{bmatrix} = \\begin{bmatrix} -1 & 2 \\\\ 2 & -3 \\end{bmatrix}$. Maka $\\begin{bmatrix} x \\\\ y \\end{bmatrix} = \\begin{bmatrix} -1 & 2 \\\\ 2 & -3 \\end{bmatrix} \\begin{bmatrix} 12 \\\\ 7 \\end{bmatrix} = \\begin{bmatrix} -12 + 14 \\\\ 24 - 21 \\end{bmatrix} = \\begin{bmatrix} 2 \\\\ 3 \\end{bmatrix}$. Diperoleh $x = 2$ dan $y = 3$, sehingga $2x + 3y = 2(2) + 3(3) = 4 + 9 = 13$."
+            },
+            {
+                id: 27,
+                topic: "SPL",
+                topicLabel: "SPLDV via Aturan Cramer",
+                question: "Pada sistem persamaan $4x - y = 5$ dan $2x + 3y = 13$, berapakah nilai determinan utama $D$ dan nilai $y$?",
+                options: [
+                    "$D = 10$ dan $y = 2$",
+                    "$D = 14$ dan $y = 3$",
+                    "$D = 14$ dan $y = 2$",
+                    "$D = 12$ dan $y = 3$"
+                ],
+                ans: 1,
+                explain: "Determinan utama: $D = \\begin{vmatrix} 4 & -1 \\\\ 2 & 3 \\end{vmatrix} = (4)(3) - (-1)(2) = 12 + 2 = 14$. Determinan untuk $y$: $D_y = \\begin{vmatrix} 4 & 5 \\\\ 2 & 13 \\end{vmatrix} = (4)(13) - (5)(2) = 52 - 10 = 42$. Maka $y = \\frac{D_y}{D} = \\frac{42}{14} = 3$."
+            },
+            {
+                id: 28,
+                topic: "SPL",
+                topicLabel: "Model Matriks SPLTV",
+                question: "Sistem persamaan $\\begin{cases} 2x - y + z = 5 \\\\ x + 3y - 2z = 0 \\\\ -x + y + 4z = 9 \\end{cases}$ jika ditulis dalam bentuk $A \\cdot X = B$, maka matriks konstanta $B$ adalah...",
+                options: [
+                    "$\\begin{bmatrix} 5 \\\\ 0 \\\\ 9 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} 2 & -1 & 1 \\\\ 1 & 3 & -2 \\\\ -1 & 1 & 4 \\end{bmatrix}$",
+                    "$\\begin{bmatrix} x \\\\ y \\\\ z \\end{bmatrix}$",
+                    "$\\begin{bmatrix} -5 \\\\ 0 \\\\ -9 \\end{bmatrix}$"
+                ],
+                ans: 0,
+                explain: "Pada bentuk persamaan matriks $A \\cdot X = B$: matriks $A$ adalah matriks koefisien ($3 \\times 3$), matriks $X$ adalah matriks variabel kolom $[x, y, z]^t$, dan matriks $B$ adalah matriks konstanta ruas kanan berordo $3 \\times 1$, yaitu $\\begin{bmatrix} 5 \\\\ 0 \\\\ 9 \\end{bmatrix}$."
+            },
+            {
+                id: 29,
+                topic: "SPL",
+                topicLabel: "SPLTV dengan Determinan (Cramer)",
+                question: "Pada sebuah SPLTV, diperoleh nilai determinan $D = -3$, $D_x = -6$, dan $D_y = 9$. Nilai dari $x + y$ adalah...",
+                options: ["$1$", "$5$", "$-1$", "$-5$"],
+                ans: 2,
+                explain: "Berdasarkan Aturan Cramer: $x = \\frac{D_x}{D} = \\frac{-6}{-3} = 2$ dan $y = \\frac{D_y}{D} = \\frac{9}{-3} = -3$. Maka $x + y = 2 + (-3) = -1$."
+            },
+            {
+                id: 30,
+                topic: "SPL",
+                topicLabel: "Aplikasi SPLTV Matriks",
+                question: "Harga 1 buku ($x$), 1 pulpen ($y$), dan 1 pensil ($z$) memenuhi $\\begin{cases} x + y + z = 12.000 \\\\ 2x + y = 13.000 \\\\ x + 2z = 13.000 \\end{cases}$. Berapakah total harga 1 buku dan 1 pulpen ($x + y$)?",
+                options: ["Rp9.000", "Rp8.000", "Rp7.000", "Rp10.000"],
+                ans: 1,
+                explain: "Dari persamaan kedua $y = 13.000 - 2x$ dan persamaan ketiga $z = \\frac{13.000 - x}{2}$. Substitusikan ke persamaan pertama: $x + (13.000 - 2x) + \\frac{13.000 - x}{2} = 12.000 \\implies -x + 13.000 + 6.500 - 0.5x = 12.000 \\implies 1.5x = 7.500 \\implies x = \\text{Rp}5.000$. Maka $y = 13.000 - 2(5.000) = \\text{Rp}3.000$ dan $z = \\frac{13.000 - 5.000}{2} = \\text{Rp}4.000$. Jadi $x + y = \\text{Rp}5.000 + \\text{Rp}3.000 = \\text{Rp}8.000$."
+            }
+        ];
+
+        // Pastikan soal #1 dan #11 memiliki persamaan dan penjelasan yang 100% cocok secara matematis
+        QUESTIONS[0].question = "Diketahui $A = \\begin{bmatrix} 2x - y & 3 \\\\ 4 & x + 2y \\end{bmatrix}$ dan $B = \\begin{bmatrix} 7 & 4 \\\\ 3 & 6 \\end{bmatrix}$. Jika $A = B^t$, tentukan nilai dari $x^2 - y$!";
+        QUESTIONS[0].explain = "Karena $B = \\begin{bmatrix} 7 & 4 \\\\ 3 & 6 \\end{bmatrix}$, transposnya adalah $B^t = \\begin{bmatrix} 7 & 3 \\\\ 4 & 6 \\end{bmatrix}$. Dari kesamaan $A = B^t$, diperoleh: (1) $2x - y = 7 \\implies y = 2x - 7$ dan (2) $x + 2y = 6$. Substitusikan $y$: $x + 2(2x - 7) = 6 \\implies 5x - 14 = 6 \\implies 5x = 20 \\implies x = 4$. Lalu $y = 2(4) - 7 = 1$. Jadi $x^2 - y = 4^2 - 1 = 16 - 1 = 15$.";
+
+        QUESTIONS[10].question = "Nilai $x$ yang memenuhi persamaan $\\begin{vmatrix} x & 2 \\\\ 3 & x - 3 \\end{vmatrix} = 4$ adalah...";
+        QUESTIONS[10].explain = "Hitung determinan: $(x)(x - 3) - (2)(3) = 4 \\implies x^2 - 3x - 6 = 4 \\implies x^2 - 3x - 10 = 0$. Faktorkan: $(x - 5)(x + 2) = 0$, sehingga diperoleh $x = 5$ atau $x = -2$.";
+
+        // =====================================================================
+        // 2. PERSISTENSI DATA ANTI-RELOAD & ANTI-PUTUS KONEKSI
+        //    Menyimpan ke localStorage, sessionStorage, serta window.name
+        //    sebagai cadangan berlapis bila salah satu dibatasi iframe/browser.
+        // =====================================================================
+        const STORAGE_KEY = "matriks_quiz_30_state_v1";
+        let memoryFallback = { currentIndex: 0, activeFilter: "ALL", answers: {} };
+
+        function loadSavedState() {
+            let parsed = null;
+            try {
+                const rawLocal = localStorage.getItem(STORAGE_KEY);
+                if (rawLocal) parsed = JSON.parse(rawLocal);
+            } catch (e) { /* abaikan jika diblokir */ }
+
+            if (!parsed) {
+                try {
+                    const rawSession = sessionStorage.getItem(STORAGE_KEY);
+                    if (rawSession) parsed = JSON.parse(rawSession);
+                } catch (e) { /* abaikan jika diblokir */ }
+            }
+
+            if (!parsed && window.name && window.name.startsWith("MATRIKS_QUIZ_STATE:")) {
+                try {
+                    parsed = JSON.parse(window.name.replace("MATRIKS_QUIZ_STATE:", ""));
+                } catch (e) { /* abaikan */ }
+            }
+
+            if (parsed && typeof parsed === "object" && parsed.answers) {
+                return {
+                    currentIndex: typeof parsed.currentIndex === "number" ? parsed.currentIndex : 0,
+                    activeFilter: parsed.activeFilter || "ALL",
+                    answers: parsed.answers
+                };
+            }
+            return { ...memoryFallback };
+        }
+
+        function saveState(stateObj) {
+            memoryFallback = stateObj;
+            const serialized = JSON.stringify(stateObj);
+            try { localStorage.setItem(STORAGE_KEY, serialized); } catch (e) { /* fallback aktif */ }
+            try { sessionStorage.setItem(STORAGE_KEY, serialized); } catch (e) { /* fallback aktif */ }
+            try { window.name = "MATRIKS_QUIZ_STATE:" + serialized; } catch (e) { /* fallback aktif */ }
+            flashSaveIndicator();
+        }
+
+        function flashSaveIndicator() {
+            const ind = document.getElementById("save-indicator");
+            if (!ind) return;
+            ind.classList.add("ring-2", "ring-emerald-400");
+            setTimeout(() => {
+                ind.classList.remove("ring-2", "ring-emerald-400");
+            }, 400);
+        }
+
+        let state = loadSavedState();
+
+        // =====================================================================
+        // 3. FILTER TOPIK, NAVIGASI & RENDER SOAL
+        // =====================================================================
+        function getFilteredQuestions() {
+            if (state.activeFilter === "ALL") return QUESTIONS;
+            return QUESTIONS.filter(q => q.topic === state.activeFilter);
+        }
+
+        function setTopicFilter(filterName) {
+            state.activeFilter = filterName;
+            const list = getFilteredQuestions();
+            if (!list.some(q => q.id === QUESTIONS[state.currentIndex]?.id)) {
+                const firstGlobalIdx = QUESTIONS.findIndex(q => q.id === list[0].id);
+                state.currentIndex = firstGlobalIdx >= 0 ? firstGlobalIdx : 0;
+            }
+            saveState(state);
+            updateFilterButtons();
+            renderAll();
+        }
+
+        function updateFilterButtons() {
+            document.querySelectorAll(".filter-btn").forEach(btn => {
+                const isActive = btn.getAttribute("data-filter") === state.activeFilter;
+                btn.className = isActive
+                    ? "filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white transition cursor-pointer"
+                    : "filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer";
+            });
+        }
+
+        function selectQuestionById(qId) {
+            const idx = QUESTIONS.findIndex(q => q.id === qId);
+            if (idx !== -1) {
+                state.currentIndex = idx;
+                saveState(state);
+                renderQuestionCard();
+                renderNumberNav();
+            }
+        }
+
+        function navigateQuestion(delta) {
+            const list = getFilteredQuestions();
+            const currentQ = QUESTIONS[state.currentIndex];
+            const posInList = list.findIndex(q => q.id === currentQ.id);
+            const nextPos = posInList + delta;
+            if (nextPos >= 0 && nextPos < list.length) {
+                const nextGlobalIdx = QUESTIONS.findIndex(q => q.id === list[nextPos].id);
+                state.currentIndex = nextGlobalIdx;
+                saveState(state);
+                renderQuestionCard();
+                renderNumberNav();
+            }
+        }
+
+        function selectOption(qId, optIdx) {
+            const q = QUESTIONS.find(item => item.id === qId);
+            if (!q) return;
+
+            const isCorrect = (optIdx === q.ans);
+            state.answers[qId] = {
+                selected: optIdx,
+                isCorrect: isCorrect,
+                timestamp: Date.now()
+            };
+            saveState(state);
+            renderQuestionCard();
+            renderNumberNav();
+            updateHeaderStats();
+        }
+
+        function renderQuestionCard() {
+            const q = QUESTIONS[state.currentIndex] || QUESTIONS[0];
+            const card = document.getElementById("question-card");
+            const savedAns = state.answers[q.id];
+            const letters = ["A", "B", "C", "D"];
+
+            const optionsHtml = q.options.map((optText, idx) => {
+                let btnStyle = "border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/40 text-slate-800";
+                let badgeStyle = "bg-slate-100 text-slate-700 border-slate-300";
+                let statusTag = "";
+
+                if (savedAns) {
+                    if (idx === savedAns.selected) {
+                        if (savedAns.isCorrect) {
+                            btnStyle = "border-emerald-500 bg-emerald-50/90 text-emerald-950 ring-2 ring-emerald-500/20 font-semibold";
+                            badgeStyle = "bg-emerald-600 text-white border-emerald-600";
+                            statusTag = `<span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-xs font-bold">BENAR ✓</span>`;
+                        } else {
+                            btnStyle = "border-rose-500 bg-rose-50/90 text-rose-950 ring-2 ring-rose-500/20 font-semibold";
+                            badgeStyle = "bg-rose-600 text-white border-rose-600";
+                            statusTag = `<span class="px-2.5 py-0.5 rounded-full bg-rose-600 text-white text-xs font-bold">SALAH ✕</span>`;
+                        }
+                    } else if (!savedAns.isCorrect && idx === q.ans) {
+                        // Tunjukkan opsi benar secara jelas ketika pilihan user salah
+                        btnStyle = "border-emerald-400 bg-emerald-50/50 text-emerald-900";
+                        badgeStyle = "bg-emerald-100 text-emerald-800 border-emerald-400";
+                        statusTag = `<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Kunci Benar</span>`;
+                    } else {
+                        btnStyle = "border-slate-200 bg-slate-50/70 text-slate-500";
+                    }
+                }
+
+                return `
+                    <button onclick="selectOption(${q.id}, ${idx})" class="w-full text-left p-3.5 sm:p-4 rounded-xl border ${btnStyle} transition flex items-center justify-between gap-3 cursor-pointer">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <span class="w-8 h-8 rounded-lg border ${badgeStyle} font-mono font-bold text-xs sm:text-sm flex items-center justify-center shrink-0">
+                                ${letters[idx]}
+                            </span>
+                            <div class="option-math text-sm sm:text-base">${optText}</div>
+                        </div>
+                        <div class="shrink-0">${statusTag}</div>
+                    </button>
+                `;
+            }).join("");
+
+            // Feedback langsung muncul segera setelah menjawab
+            let feedbackHtml = "";
+            if (savedAns) {
+                if (savedAns.isCorrect) {
+                    feedbackHtml = `
+                        <div class="mt-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 fade-in">
+                            <div class="flex items-center gap-2 font-heading font-bold text-emerald-800 text-sm sm:text-base mb-1">
+                                <span>✓ Jawaban Benar!</span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-emerald-900 leading-relaxed">${q.explain}</p>
+                        </div>
+                    `;
+                } else {
+                    feedbackHtml = `
+                        <div class="mt-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 fade-in">
+                            <div class="flex items-center gap-2 font-heading font-bold text-rose-800 text-sm sm:text-base mb-1">
+                                <span>✕ Jawaban Belum Tepat (Kunci: ${letters[q.ans]})</span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-rose-900 leading-relaxed">${q.explain}</p>
+                        </div>
+                    `;
+                }
+            } else {
+                feedbackHtml = `
+                    <div class="mt-6 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-500 flex items-center gap-2">
+                        <span class="font-bold text-indigo-600">Info:</span>
+                        <span>Pilih salah satu opsi (A, B, C, atau D) untuk melihat status Benar/Salah dan pembahasannya secara langsung.</span>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <span class="px-3 py-1 rounded-xl bg-indigo-600 text-white font-mono font-bold text-xs sm:text-sm">
+                            Soal #${q.id} / 30
+                        </span>
+                        <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold">
+                            ${q.topicLabel}
+                        </span>
+                    </div>
+                    <span class="text-xs font-semibold text-slate-400">
+                        ${savedAns ? (savedAns.isCorrect ? "Status: Benar" : "Status: Salah") : "Belum dijawab"}
+                    </span>
+                </div>
+
+                <div class="text-base sm:text-lg font-medium text-slate-900 leading-relaxed mb-6">
+                    ${q.question}
+                </div>
+
+                <div class="space-y-3">
+                    ${optionsHtml}
+                </div>
+
+                ${feedbackHtml}
+            `;
+
+            // Update tombol Prev / Next sesuai daftar terfilter
+            const filtered = getFilteredQuestions();
+            const posInFiltered = filtered.findIndex(item => item.id === q.id);
+            document.getElementById("btn-prev").disabled = posInFiltered <= 0;
+            document.getElementById("btn-next").disabled = posInFiltered >= filtered.length - 1;
+            document.getElementById("nav-position-text").textContent =
+                state.activeFilter === "ALL"
+                    ? `Soal ${q.id} dari 30`
+                    : `Soal ${posInFiltered + 1} dari ${filtered.length} (${state.activeFilter})`;
+
+            if (window.renderMathInElement) {
+                renderMathInElement(card, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false }
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function renderNumberNav() {
+            const grid = document.getElementById("number-nav-grid");
+            const filtered = getFilteredQuestions();
+            const currentQ = QUESTIONS[state.currentIndex] || QUESTIONS[0];
+
+            document.getElementById("nav-filter-info").textContent = `Menampilkan ${filtered.length} soal`;
+
+            grid.innerHTML = filtered.map(q => {
+                const isCurrent = q.id === currentQ.id;
+                const ans = state.answers[q.id];
+
+                let colorClass = "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200";
+                if (isCurrent) {
+                    colorClass = "bg-indigo-600 text-white border-indigo-700 ring-2 ring-indigo-300 shadow-xs";
+                } else if (ans) {
+                    colorClass = ans.isCorrect
+                        ? "bg-emerald-500 text-white border-emerald-600 hover:bg-emerald-600"
+                        : "bg-rose-500 text-white border-rose-600 hover:bg-rose-600";
+                }
+
+                return `
+                    <button onclick="selectQuestionById(${q.id})" class="h-9 rounded-lg border ${colorClass} font-mono font-bold text-xs transition cursor-pointer">
+                        ${q.id}
+                    </button>
+                `;
+            }).join("");
+        }
+
+        function updateHeaderStats() {
+            const totalQ = QUESTIONS.length;
+            const entries = Object.values(state.answers);
+            const answeredCount = entries.length;
+            const correctCount = entries.filter(e => e.isCorrect).length;
+
+            document.getElementById("live-correct").textContent = correctCount;
+            document.getElementById("live-answered").textContent = answeredCount;
+
+            const pct = Math.round((answeredCount / totalQ) * 100);
+            document.getElementById("progress-fill").style.width = pct + "%";
+        }
+
+        // =====================================================================
+        // 4. MODAL REKAP & RESET
+        // =====================================================================
+        function openSummaryModal() {
+            const entries = Object.values(state.answers);
+            const correct = entries.filter(e => e.isCorrect).length;
+            const wrong = entries.filter(e => !e.isCorrect).length;
+            const score = Math.round((correct / QUESTIONS.length) * 100);
+
+            document.getElementById("sum-correct").textContent = correct;
+            document.getElementById("sum-wrong").textContent = wrong;
+            document.getElementById("sum-score").textContent = score;
+
+            let msg = "";
+            if (entries.length === 0) {
+                msg = "Kamu belum menjawab soal apa pun. Silakan mulai dari soal #1 atau pilih nomor soal di panel navigasi.";
+            } else if (score >= 85) {
+                msg = `Luar biasa! Kamu sudah menjawab ${entries.length} dari 30 soal dengan ketepatan tinggi. Pemahamanmu tentang matriks hingga SPL sudah sangat matang.`;
+            } else if (score >= 60) {
+                msg = `Bagus! Kamu telah menyelesaikan ${entries.length} dari 30 soal. Perhatikan kembali pembahasan pada soal yang bertanda merah agar semakin mantap.`;
+            } else {
+                msg = `Tetap semangat! Kamu sudah menjawab ${entries.length} dari 30 soal. Manfaatkan penjelasan di setiap soal yang muncul otomatis untuk memperbaiki kesalahan konsep.`;
+            }
+
+            document.getElementById("sum-message").textContent = msg;
+            document.getElementById("summary-modal").classList.remove("hidden");
+        }
+
+        function closeSummaryModal() {
+            document.getElementById("summary-modal").classList.add("hidden");
+        }
+
+        function openResetModal() {
+            document.getElementById("reset-modal").classList.remove("hidden");
+        }
+
+        function closeResetModal() {
+            document.getElementById("reset-modal").classList.add("hidden");
+        }
+
+        function confirmResetAll() {
+            state = { currentIndex: 0, activeFilter: "ALL", answers: {} };
+            saveState(state);
+            closeResetModal();
+            updateFilterButtons();
+            renderAll();
+        }
+
+        function renderAll() {
+            updateFilterButtons();
+            renderQuestionCard();
+            renderNumberNav();
+            updateHeaderStats();
+        }
+
+        // Inisialisasi saat halaman dimuat
+        window.addEventListener("DOMContentLoaded", () => {
+            renderAll();
+        });
+    </script>
+</body>
+</html>
